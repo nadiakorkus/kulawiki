@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word World 🌍</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --explorer-a:#43e97b; --explorer-b:#38f9d7;
+    --adventurer-a:#f7971e; --adventurer-b:#ffd200;
+    --champion-a:#4facfe; --champion-b:#a855f7;
+    --white:#FFFEF7; --dark:#1e1b4b; --gray:#6b7280;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Nunito',sans-serif;background:#f0f4ff;min-height:100vh;overflow-x:hidden;}
+  .screen{display:none;min-height:100vh;}
+  .screen.active{display:flex;flex-direction:column;align-items:center;}
+
+  /* HOME */
+  #home{background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4c1d95 100%);justify-content:center;padding:40px 20px;position:relative;overflow:hidden;}
+  #home::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(99,102,241,.3) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(168,85,247,.25) 0%,transparent 50%);}
+  .stars-bg{position:absolute;inset:0;pointer-events:none;}
+  .star-dot{position:absolute;background:white;border-radius:50%;animation:twinkle 3s ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:.2}50%{opacity:1}}
+  .home-inner{position:relative;z-index:1;text-align:center;max-width:860px;width:100%;}
+  .mascot{font-size:72px;display:block;animation:bob 3s ease-in-out infinite;margin-bottom:12px;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .title{font-family:'Fredoka One',cursive;font-size:clamp(52px,9vw,88px);color:white;text-shadow:0 6px 0 rgba(0,0,0,.25);letter-spacing:3px;line-height:1;margin-bottom:6px;}
+  .tagline{font-size:16px;color:rgba(255,255,255,.7);font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:48px;}
+  .section-label{font-size:12px;font-weight:900;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:16px;}
+  .mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;}
+  .mode-card{background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);border-radius:20px;padding:24px 16px;cursor:pointer;transition:all .2s;text-align:center;backdrop-filter:blur(10px);position:relative;overflow:hidden;}
+  .mode-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0;}
+  .mode-card.explorer::after{background:linear-gradient(90deg,var(--explorer-a),var(--explorer-b));}
+  .mode-card.adventurer::after{background:linear-gradient(90deg,var(--adventurer-a),var(--adventurer-b));}
+  .mode-card.champion::after{background:linear-gradient(90deg,var(--champion-a),var(--champion-b));}
+  .mode-card:hover{background:rgba(255,255,255,.15);transform:translateY(-3px);border-color:rgba(255,255,255,.3);}
+  .mode-card:active{transform:translateY(0);}
+  .mode-emoji{font-size:40px;display:block;margin-bottom:10px;}
+  .mode-name{font-family:'Fredoka One',cursive;font-size:20px;color:white;margin-bottom:4px;}
+  .mode-sub{font-size:12px;color:rgba(255,255,255,.55);font-weight:700;margin-bottom:10px;}
+  .mode-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:900;letter-spacing:.5px;}
+  .mode-card.explorer .mode-badge{background:rgba(67,233,123,.2);color:#43e97b;}
+  .mode-card.adventurer .mode-badge{background:rgba(247,151,30,.2);color:#ffd200;}
+  .mode-card.champion .mode-badge{background:rgba(79,172,254,.2);color:#4facfe;}
+
+  /* TOPICS */
+  #topics{background:#f0f4ff;padding:0;justify-content:flex-start;}
+  .topic-header{width:100%;padding:20px 24px 16px;display:flex;align-items:center;gap:16px;}
+  .header-explorer{background:linear-gradient(90deg,var(--explorer-a),var(--explorer-b));}
+  .header-adventurer{background:linear-gradient(90deg,var(--adventurer-a),var(--adventurer-b));}
+  .header-champion{background:linear-gradient(90deg,var(--champion-a),var(--champion-b));}
+  .back-btn{background:rgba(255,255,255,.3);border:none;border-radius:12px;padding:8px 14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;cursor:pointer;color:white;transition:background .2s;}
+  .back-btn:hover{background:rgba(255,255,255,.5);}
+  .header-title{font-family:'Fredoka One',cursive;font-size:22px;color:white;flex:1;}
+  .topics-body{width:100%;max-width:760px;padding:28px 20px;}
+  .topics-intro{text-align:center;margin-bottom:28px;}
+  .topics-intro h2{font-family:'Fredoka One',cursive;font-size:28px;color:var(--dark);margin-bottom:6px;}
+  .topics-intro p{color:var(--gray);font-size:15px;font-weight:600;}
+  .topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;}
+  .topic-card{background:white;border-radius:18px;padding:20px 14px;cursor:pointer;transition:all .2s;text-align:center;box-shadow:0 4px 0 rgba(0,0,0,.08);border:2px solid transparent;}
+  .topic-card:hover{transform:translateY(-3px);box-shadow:0 8px 0 rgba(0,0,0,.1);border-color:#c7d2fe;}
+  .topic-emoji{font-size:36px;display:block;margin-bottom:8px;}
+  .topic-en{font-family:'Fredoka One',cursive;font-size:16px;color:var(--dark);margin-bottom:2px;}
+  .topic-pl{font-size:12px;color:var(--gray);font-weight:700;}
+
+  /* GAME */
+  #game{background:#f0f4ff;justify-content:flex-start;padding:0;}
+  .game-header{width:100%;padding:16px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;}
+  .header-info{flex:1;}
+  .header-info .lesson-name{font-family:'Fredoka One',cursive;font-size:18px;color:white;line-height:1.1;}
+  .header-info .progress-text{font-size:12px;color:rgba(255,255,255,.75);font-weight:700;}
+  .stars-counter{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.25);border-radius:20px;padding:6px 14px;}
+  .stars-counter span{font-family:'Fredoka One',cursive;font-size:18px;color:white;}
+  .progress-strip{width:100%;height:6px;background:rgba(255,255,255,.25);}
+  .progress-fill{height:100%;background:rgba(255,255,255,.8);transition:width .5s ease;}
+  .game-body{flex:1;width:100%;max-width:680px;margin:0 auto;padding:28px 20px;}
+  .q-card{background:white;border-radius:24px;padding:32px;box-shadow:0 6px 0 rgba(0,0,0,.08);animation:slideUp .35s ease;}
+  @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .q-type-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;}
+  .explorer-badge{background:#d1fae5;color:#059669;}
+  .adventurer-badge{background:#fef3c7;color:#d97706;}
+  .champion-badge{background:#dbeafe;color:#2563eb;}
+  .q-prompt{font-size:15px;color:var(--gray);font-weight:700;margin-bottom:8px;}
+  .q-pl{font-size:22px;font-weight:900;color:var(--dark);margin-bottom:6px;line-height:1.3;}
+  .q-en-hint{font-size:16px;color:#a78bfa;font-weight:700;margin-bottom:24px;font-style:italic;}
+  .q-emoji-big{font-size:72px;text-align:center;display:block;margin:16px 0;}
+  .choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;}
+  .choice-btn{background:#f8faff;border:2px solid #e0e7ff;border-radius:14px;padding:16px 14px;cursor:pointer;transition:all .15s;text-align:left;font-family:'Nunito',sans-serif;}
+  .choice-btn:hover{background:#eef2ff;border-color:#a5b4fc;transform:translateY(-1px);}
+  .choice-btn .choice-en{font-size:17px;font-weight:800;color:var(--dark);display:block;}
+  .choice-btn .choice-pl{font-size:13px;color:var(--gray);font-weight:600;display:block;margin-top:2px;}
+  .choice-btn.correct{background:#d1fae5;border-color:#34d399!important;}
+  .choice-btn.wrong{background:#fee2e2;border-color:#f87171!important;}
+  .choice-btn:disabled{cursor:default;transform:none;}
+  .type-area{margin-top:8px;}
+  .type-input{width:100%;padding:14px 18px;border:2px solid #e0e7ff;border-radius:14px;font-family:'Nunito',sans-serif;font-size:20px;font-weight:800;color:var(--dark);outline:none;transition:border-color .2s;}
+  .type-input:focus{border-color:#a5b4fc;}
+  .type-input.correct{border-color:#34d399;background:#d1fae5;}
+  .type-input.wrong{border-color:#f87171;background:#fee2e2;}
+  .submit-btn{margin-top:14px;width:100%;padding:14px;border:none;border-radius:14px;font-family:'Fredoka One',cursive;font-size:20px;cursor:pointer;transition:all .15s;box-shadow:0 4px 0 rgba(0,0,0,.15);}
+  .submit-btn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.15);}
+  .explorer-btn{background:linear-gradient(90deg,var(--explorer-a),var(--explorer-b));color:var(--dark);}
+  .adventurer-btn{background:linear-gradient(90deg,var(--adventurer-a),var(--adventurer-b));color:var(--dark);}
+  .champion-btn{background:linear-gradient(90deg,var(--champion-a),var(--champion-b));color:white;}
+  .word-builder{margin-top:8px;}
+  .word-bank{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;min-height:48px;padding:10px;background:#f8faff;border:2px dashed #e0e7ff;border-radius:14px;}
+  .answer-slots{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;min-height:52px;padding:10px;background:#f0f7ff;border:2px solid #c7d2fe;border-radius:14px;align-items:center;}
+  .answer-slots .slot-hint{color:#a5b4fc;font-size:13px;font-weight:700;}
+  .word-tile{padding:8px 14px;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer;transition:all .15s;user-select:none;box-shadow:0 2px 0 rgba(0,0,0,.12);}
+  .word-tile.bank-tile{background:white;color:var(--dark);border:2px solid #e0e7ff;}
+  .word-tile.bank-tile:hover{background:#eef2ff;border-color:#a5b4fc;transform:translateY(-1px);}
+  .word-tile.answer-tile{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;}
+  .feedback{margin-top:16px;padding:14px 18px;border-radius:14px;font-weight:800;font-size:15px;display:none;align-items:center;gap:10px;}
+  .feedback.show{display:flex;}
+  .feedback.correct-fb{background:#d1fae5;color:#065f46;}
+  .feedback.wrong-fb{background:#fee2e2;color:#991b1b;}
+  .feedback .fb-icon{font-size:22px;}
+  .next-btn{margin-top:16px;width:100%;padding:14px;border:none;border-radius:14px;font-family:'Fredoka One',cursive;font-size:20px;cursor:pointer;color:white;transition:all .15s;box-shadow:0 4px 0 rgba(0,0,0,.15);display:none;}
+  .next-btn.show{display:block;}
+  .next-btn:active{transform:translateY(2px);}
+
+  /* RESULTS */
+  #results{background:linear-gradient(135deg,#1e1b4b,#312e81);justify-content:center;padding:40px 20px;text-align:center;}
+  .results-inner{max-width:500px;width:100%;}
+  .results-trophy{font-size:80px;display:block;animation:bob 2s ease-in-out infinite;margin-bottom:16px;}
+  .results-title{font-family:'Fredoka One',cursive;font-size:42px;color:white;margin-bottom:6px;}
+  .results-pl{font-size:18px;color:rgba(255,255,255,.65);font-weight:700;margin-bottom:30px;}
+  .results-stars{background:rgba(255,255,255,.1);border-radius:20px;padding:24px;margin-bottom:24px;backdrop-filter:blur(10px);}
+  .stars-earned{font-size:56px;font-family:'Fredoka One',cursive;color:#ffd200;}
+  .stars-label{font-size:14px;color:rgba(255,255,255,.6);font-weight:700;letter-spacing:1px;margin-top:4px;}
+  .score-detail{font-size:16px;color:rgba(255,255,255,.8);font-weight:700;margin-top:8px;}
+  .results-btns{display:flex;flex-direction:column;gap:12px;}
+  .res-btn{padding:16px 24px;border:none;border-radius:16px;font-family:'Fredoka One',cursive;font-size:20px;cursor:pointer;transition:all .15s;box-shadow:0 4px 0 rgba(0,0,0,.2);}
+  .res-btn:active{transform:translateY(2px);box-shadow:0 2px 0;}
+  .res-btn.primary{background:linear-gradient(90deg,#43e97b,#38f9d7);color:var(--dark);}
+  .res-btn.secondary{background:rgba(255,255,255,.1);color:white;border:2px solid rgba(255,255,255,.2);box-shadow:none;}
+
+  .word-tile.letter-tile{min-width:40px;text-align:center;font-size:20px;font-weight:900;}
+  .word-tile.answer-tile.letter{background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:20px;min-width:40px;text-align:center;}
+
+  .confetti-piece{position:fixed;pointer-events:none;animation:cffall linear forwards;z-index:9999;}
+  @keyframes cffall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+  /* READING */
+  .reading-text-box{background:#f8faff;border:2px solid #e0e7ff;border-radius:16px;padding:20px 24px;margin-bottom:20px;line-height:1.9;font-size:17px;color:var(--dark);font-weight:600;}
+  .reading-text-box .hl{background:#fef3c7;border-bottom:2px solid #f59e0b;cursor:pointer;border-radius:4px;padding:0 2px;position:relative;}
+  .tooltip{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#1e1b4b;color:white;font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px;white-space:nowrap;pointer-events:none;margin-bottom:4px;z-index:10;}
+  .tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1e1b4b;}
+  .read-label{font-size:13px;color:#a78bfa;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+  .reading-q-title{font-size:13px;font-weight:900;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
+  .reading-open-input{width:100%;padding:12px 16px;border:2px solid #e0e7ff;border-radius:12px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;color:var(--dark);outline:none;resize:none;min-height:80px;}
+  .reading-open-input:focus{border-color:#a5b4fc;}
+  .highlight-pulse{animation:hpulse .6s ease;}
+  @keyframes hpulse{0%,100%{background:#fef3c7}50%{background:#fde68a}}
+
+  /* AUDIO */
+  .speak-btn{display:inline-flex;align-items:center;gap:7px;background:#f0f4ff;border:2px solid #e0e7ff;border-radius:30px;padding:8px 16px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:#6366f1;transition:all .15s;margin-bottom:14px;}
+  .speak-btn:hover{background:#e0e7ff;border-color:#a5b4fc;}
+  .speak-btn:active{transform:scale(.97);}
+  .speak-btn.speaking{background:#e0e7ff;border-color:#6366f1;color:#4338ca;animation:speakpulse 1s ease-in-out infinite;}
+  @keyframes speakpulse{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.3)}50%{box-shadow:0 0 0 6px rgba(99,102,241,0);}}
+  .speak-icon{font-size:18px;}
+  .read-speak-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+
+  @media(max-width:600px){
+    .mode-grid{grid-template-columns:1fr;}
+    .choices{grid-template-columns:1fr;}
+    .topic-grid{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="stars-bg" id="starsBg"></div>
+  <div class="home-inner">
+    <span class="mascot">🦉</span>
+    <h1 class="title">Word World</h1>
+    <p class="tagline">Learn English · Ucz się angielskiego</p>
+    <p class="section-label">Choose your level · Wybierz poziom</p>
+    <div class="mode-grid">
+      <div class="mode-card explorer" onclick="selectMode('explorer')">
+        <span class="mode-emoji">🌱</span>
+        <div class="mode-name">Explorer</div>
+        <div class="mode-sub">Odkrywca</div>
+        <span class="mode-badge">Beginner · Początkujący</span>
+      </div>
+      <div class="mode-card adventurer" onclick="selectMode('adventurer')">
+        <span class="mode-emoji">🚀</span>
+        <div class="mode-name">Adventurer</div>
+        <div class="mode-sub">Podróżnik</div>
+        <span class="mode-badge">Intermediate · Średni</span>
+      </div>
+      <div class="mode-card champion" onclick="selectMode('champion')">
+        <span class="mode-emoji">⚡</span>
+        <div class="mode-name">Champion</div>
+        <div class="mode-sub">Mistrz</div>
+        <span class="mode-badge">Advanced · Zaawansowany</span>
+      </div>
+    </div>
+    <p style="margin-top:32px;font-size:12px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Created by Nadia Korkus</p>
+  </div>
+</div>
+
+<!-- TOPICS -->
+<div id="topics" class="screen">
+  <div class="topic-header" id="topicHeader">
+    <button class="back-btn" onclick="showScreen('home')">← Wróć</button>
+    <span class="header-title" id="topicHeaderTitle"></span>
+  </div>
+  <div class="topics-body">
+    <div class="topics-intro">
+      <h2>Pick a Topic · Wybierz temat</h2>
+      <p>What do you want to practise today? / Co chcesz dziś ćwiczyć?</p>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div id="readingCornerBtn" onclick="startReading()" style="background:white;border-radius:18px;padding:18px 22px;cursor:pointer;display:flex;align-items:center;gap:16px;box-shadow:0 4px 0 rgba(0,0,0,.08);border:2px solid transparent;transition:all .2s;">
+        <span style="font-size:36px;">📖</span>
+        <div>
+          <div style="font-family:'Fredoka One',cursive;font-size:18px;color:#1e1b4b;">Reading Corner</div>
+          <div style="font-size:12px;color:#6b7280;font-weight:700;">Czytaj i rozumiej · Read &amp; Understand</div>
+        </div>
+        <span style="margin-left:auto;font-size:22px;">→</span>
+      </div>
+    </div>
+    <div class="topic-grid" id="topicGrid"></div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="game-header" id="gameHeader">
+    <button class="back-btn" onclick="showScreen('topics')">← Wróć</button>
+    <div class="header-info">
+      <div class="lesson-name" id="lessonName"></div>
+      <div class="progress-text" id="progressText"></div>
+    </div>
+    <div class="stars-counter">⭐ <span id="starCount">0</span></div>
+  </div>
+  <div class="progress-strip"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="game-body">
+    <div class="q-card" id="qCard"></div>
+  </div>
+</div>
+
+<!-- READING SCREEN -->
+<div id="reading" class="screen">
+  <div class="game-header" id="readingHeader">
+    <button class="back-btn" onclick="showScreen('topics')">← Wróć</button>
+    <div class="header-info">
+      <div class="lesson-name" id="readingLessonName"></div>
+      <div class="progress-text" id="readingProgressText"></div>
+    </div>
+    <div class="stars-counter">⭐ <span id="readingStarCount">0</span></div>
+  </div>
+  <div class="progress-strip"><div class="progress-fill" id="readingProgressFill" style="width:0%"></div></div>
+  <div class="game-body">
+    <div class="q-card" id="readingCard"></div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="screen">
+  <div class="results-inner">
+    <span class="results-trophy" id="resultsTrophy">🏆</span>
+    <h2 class="results-title" id="resultsTitle"></h2>
+    <p class="results-pl" id="resultsPl"></p>
+    <div class="results-stars">
+      <div class="stars-earned" id="starsEarned"></div>
+      <div class="stars-label">STARS EARNED · ZDOBYTE GWIAZDKI</div>
+      <div class="score-detail" id="scoreDetail"></div>
+    </div>
+    <div class="results-btns">
+      <button class="res-btn primary" onclick="playAgain()">🔄 Play Again · Zagraj ponownie</button>
+      <button class="res-btn secondary" onclick="showScreen('topics')">📚 New Topic · Nowy temat</button>
+      <button class="res-btn secondary" onclick="showScreen('home')">🏠 Home · Strona główna</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOPICS=[
+  {id:'animals',en:'Animals',pl:'Zwierzęta',emoji:'🐾'},
+  {id:'food',en:'Food & Drink',pl:'Jedzenie i napoje',emoji:'🍎'},
+  {id:'family',en:'Family',pl:'Rodzina',emoji:'👨‍👩‍👧'},
+  {id:'school',en:'School',pl:'Szkoła',emoji:'🏫'},
+  {id:'colours',en:'Colours',pl:'Kolory',emoji:'🎨'},
+  {id:'body',en:'Body Parts',pl:'Części ciała',emoji:'🧍'},
+  {id:'weather',en:'Weather',pl:'Pogoda',emoji:'⛅'},
+  {id:'clothes',en:'Clothes',pl:'Ubrania',emoji:'👗'},
+  {id:'home',en:'Home',pl:'Dom',emoji:'🏠'},
+  {id:'transport',en:'Transport',pl:'Transport',emoji:'🚗'},
+  {id:'numbers',en:'Numbers',pl:'Liczby',emoji:'🔢'},
+  {id:'time',en:'Time & Days',pl:'Czas i dni',emoji:'🕐'},
+  {id:'places',en:'Places in Town',pl:'Miejsca w mieście',emoji:'🗺️'},
+];
+
+const VOCAB={
+  animals:[{en:'dog',pl:'pies',emoji:'🐶'},{en:'cat',pl:'kot',emoji:'🐱'},{en:'bird',pl:'ptak',emoji:'🐦'},{en:'fish',pl:'ryba',emoji:'🐟'},{en:'horse',pl:'koń',emoji:'🐴'},{en:'rabbit',pl:'królik',emoji:'🐰'},{en:'elephant',pl:'słoń',emoji:'🐘'},{en:'lion',pl:'lew',emoji:'🦁'},{en:'monkey',pl:'małpa',emoji:'🐒'},{en:'penguin',pl:'pingwin',emoji:'🐧'}],
+  food:[{en:'apple',pl:'jabłko',emoji:'🍎'},{en:'bread',pl:'chleb',emoji:'🍞'},{en:'milk',pl:'mleko',emoji:'🥛'},{en:'egg',pl:'jajko',emoji:'🥚'},{en:'cheese',pl:'ser',emoji:'🧀'},{en:'water',pl:'woda',emoji:'💧'},{en:'pizza',pl:'pizza',emoji:'🍕'},{en:'soup',pl:'zupa',emoji:'🥣'},{en:'cake',pl:'ciasto',emoji:'🎂'},{en:'orange',pl:'pomarańcza',emoji:'🍊'}],
+  family:[{en:'mother',pl:'mama',emoji:'👩'},{en:'father',pl:'tata',emoji:'👨'},{en:'sister',pl:'siostra',emoji:'👧'},{en:'brother',pl:'brat',emoji:'👦'},{en:'grandmother',pl:'babcia',emoji:'👵'},{en:'grandfather',pl:'dziadek',emoji:'👴'},{en:'aunt',pl:'ciocia',emoji:'🧕'},{en:'uncle',pl:'wujek',emoji:'🧔'},{en:'baby',pl:'niemowlę',emoji:'👶'},{en:'family',pl:'rodzina',emoji:'👨‍👩‍👧‍👦'}],
+  school:[{en:'book',pl:'książka',emoji:'📚'},{en:'pen',pl:'długopis',emoji:'🖊️'},{en:'pencil',pl:'ołówek',emoji:'✏️'},{en:'ruler',pl:'linijka',emoji:'📏'},{en:'bag',pl:'plecak',emoji:'🎒'},{en:'desk',pl:'ławka',emoji:'🪑'},{en:'teacher',pl:'nauczyciel',emoji:'👩‍🏫'},{en:'board',pl:'tablica',emoji:'🖥️'},{en:'rubber',pl:'gumka',emoji:'🧹'},{en:'scissors',pl:'nożyczki',emoji:'✂️'}],
+  colours:[{en:'red',pl:'czerwony',emoji:'🔴'},{en:'blue',pl:'niebieski',emoji:'🔵'},{en:'green',pl:'zielony',emoji:'🟢'},{en:'yellow',pl:'żółty',emoji:'🟡'},{en:'orange',pl:'pomarańczowy',emoji:'🟠'},{en:'purple',pl:'fioletowy',emoji:'🟣'},{en:'pink',pl:'różowy',emoji:'🩷'},{en:'white',pl:'biały',emoji:'⬜'},{en:'black',pl:'czarny',emoji:'⬛'},{en:'brown',pl:'brązowy',emoji:'🟫'}],
+  body:[{en:'head',pl:'głowa',emoji:'🗣️'},{en:'eye',pl:'oko',emoji:'👁️'},{en:'nose',pl:'nos',emoji:'👃'},{en:'mouth',pl:'usta',emoji:'👄'},{en:'ear',pl:'ucho',emoji:'👂'},{en:'hand',pl:'ręka',emoji:'✋'},{en:'foot',pl:'stopa',emoji:'🦶'},{en:'arm',pl:'ramię',emoji:'💪'},{en:'leg',pl:'noga',emoji:'🦵'},{en:'hair',pl:'włosy',emoji:'💇'}],
+  weather:[{en:'sunny',pl:'słonecznie',emoji:'☀️'},{en:'rainy',pl:'deszczowo',emoji:'🌧️'},{en:'cloudy',pl:'pochmurno',emoji:'☁️'},{en:'windy',pl:'wietrznie',emoji:'💨'},{en:'snowy',pl:'śnieżnie',emoji:'❄️'},{en:'foggy',pl:'mgliście',emoji:'🌫️'},{en:'hot',pl:'gorąco',emoji:'🌡️'},{en:'cold',pl:'zimno',emoji:'🥶'},{en:'storm',pl:'burza',emoji:'⛈️'},{en:'rainbow',pl:'tęcza',emoji:'🌈'}],
+  clothes:[{en:'shirt',pl:'koszula',emoji:'👕'},{en:'trousers',pl:'spodnie',emoji:'👖'},{en:'dress',pl:'sukienka',emoji:'👗'},{en:'shoes',pl:'buty',emoji:'👟'},{en:'hat',pl:'czapka',emoji:'🧢'},{en:'coat',pl:'płaszcz',emoji:'🧥'},{en:'socks',pl:'skarpetki',emoji:'🧦'},{en:'scarf',pl:'szalik',emoji:'🧣'},{en:'gloves',pl:'rękawiczki',emoji:'🧤'},{en:'jumper',pl:'sweter',emoji:'🧶'}],
+  home:[{en:'door',pl:'drzwi',emoji:'🚪'},{en:'window',pl:'okno',emoji:'🪟'},{en:'bed',pl:'łóżko',emoji:'🛏️'},{en:'chair',pl:'krzesło',emoji:'🪑'},{en:'table',pl:'stół',emoji:'🪵'},{en:'kitchen',pl:'kuchnia',emoji:'🍳'},{en:'bathroom',pl:'łazienka',emoji:'🛁'},{en:'sofa',pl:'sofa',emoji:'🛋️'},{en:'lamp',pl:'lampa',emoji:'💡'},{en:'garden',pl:'ogród',emoji:'🌳'}],
+  transport:[{en:'car',pl:'samochód',emoji:'🚗'},{en:'bus',pl:'autobus',emoji:'🚌'},{en:'train',pl:'pociąg',emoji:'🚂'},{en:'plane',pl:'samolot',emoji:'✈️'},{en:'bicycle',pl:'rower',emoji:'🚲'},{en:'boat',pl:'łódka',emoji:'⛵'},{en:'lorry',pl:'ciężarówka',emoji:'🚛'},{en:'taxi',pl:'taksówka',emoji:'🚕'},{en:'motorbike',pl:'motocykl',emoji:'🏍️'},{en:'tram',pl:'tramwaj',emoji:'🚃'}],
+  numbers:[{en:'one',pl:'jeden',emoji:'1️⃣'},{en:'two',pl:'dwa',emoji:'2️⃣'},{en:'three',pl:'trzy',emoji:'3️⃣'},{en:'four',pl:'cztery',emoji:'4️⃣'},{en:'five',pl:'pięć',emoji:'5️⃣'},{en:'six',pl:'sześć',emoji:'6️⃣'},{en:'seven',pl:'siedem',emoji:'7️⃣'},{en:'eight',pl:'osiem',emoji:'8️⃣'},{en:'nine',pl:'dziewięć',emoji:'9️⃣'},{en:'ten',pl:'dziesięć',emoji:'🔟'}],
+  time:[{en:'Monday',pl:'poniedziałek',emoji:'📅'},{en:'Tuesday',pl:'wtorek',emoji:'📆'},{en:'Wednesday',pl:'środa',emoji:'🗓️'},{en:'Thursday',pl:'czwartek',emoji:'📅'},{en:'Friday',pl:'piątek',emoji:'🎉'},{en:'Saturday',pl:'sobota',emoji:'😊'},{en:'Sunday',pl:'niedziela',emoji:'⛪'},{en:'morning',pl:'rano',emoji:'🌅'},{en:'afternoon',pl:'popołudnie',emoji:'☀️'},{en:'night',pl:'noc',emoji:'🌙'}],
+  places:[{en:'cinema',pl:'kino',emoji:'🎬'},{en:'museum',pl:'muzeum',emoji:'🏛️'},{en:'beach',pl:'plaża',emoji:'🏖️'},{en:'park',pl:'park',emoji:'🌳'},{en:'sports centre',pl:'centrum sportowe',emoji:'🏋️'},{en:'ice rink',pl:'lodowisko',emoji:'⛸️'},{en:'aquarium',pl:'akwarium',emoji:'🐠'},{en:'water park',pl:'park wodny',emoji:'💦'},{en:'swimming pool',pl:'basen',emoji:'🏊'},{en:'funfair',pl:'wesołe miasteczko',emoji:'🎡'},{en:'zoo',pl:'zoo',emoji:'🦁'},{en:'science museum',pl:'muzeum nauki',emoji:'🔬'}],
+};
+
+const SENTENCES={
+  animals:[
+    {en:'The [dog] is very friendly.',pl:'Pies jest bardzo przyjazny.',blank:'dog',options:['dog','cat','bird','fish']},
+    {en:'I have a [rabbit] at home.',pl:'Mam królika w domu.',blank:'rabbit',options:['rabbit','horse','lion','monkey']},
+    {en:'The [elephant] is the biggest animal.',pl:'Słoń jest największym zwierzęciem.',blank:'elephant',options:['elephant','penguin','fish','cat']},
+    {en:'A [bird] can fly high.',pl:'Ptak może latać wysoko.',blank:'bird',options:['bird','dog','rabbit','horse']},
+    {en:'The [lion] is the king of animals.',pl:'Lew jest królem zwierząt.',blank:'lion',options:['lion','monkey','penguin','fish']},
+  ],
+  food:[
+    {en:'I eat an [apple] every day.',pl:'Jem jabłko każdego dnia.',blank:'apple',options:['apple','pizza','cake','egg']},
+    {en:'She drinks [milk] in the morning.',pl:'Ona pije mleko rano.',blank:'milk',options:['milk','water','soup','bread']},
+    {en:'We had [pizza] for dinner.',pl:'Zjedliśmy pizzę na kolację.',blank:'pizza',options:['pizza','apple','cheese','cake']},
+    {en:'The [bread] smells wonderful.',pl:'Chleb pachnie cudownie.',blank:'bread',options:['bread','egg','milk','orange']},
+    {en:'He had [soup] for lunch.',pl:'Na lunch zjadł zupę.',blank:'soup',options:['soup','cake','cheese','water']},
+  ],
+  family:[
+    {en:'My [mother] cooks very well.',pl:'Moja mama gotuje bardzo dobrze.',blank:'mother',options:['mother','sister','aunt','grandmother']},
+    {en:'My [brother] plays football.',pl:'Mój brat gra w piłkę nożną.',blank:'brother',options:['brother','father','uncle','grandfather']},
+    {en:'My [grandmother] tells great stories.',pl:'Moja babcia opowiada świetne historyjki.',blank:'grandmother',options:['grandmother','mother','sister','aunt']},
+    {en:'Our [family] is very big.',pl:'Nasza rodzina jest bardzo duża.',blank:'family',options:['family','baby','father','uncle']},
+    {en:'My [father] drives a car.',pl:'Mój tata jeździ samochodem.',blank:'father',options:['father','brother','uncle','grandfather']},
+  ],
+  school:[
+    {en:'I need a [pencil] to draw.',pl:'Potrzebuję ołówka do rysowania.',blank:'pencil',options:['pencil','ruler','bag','desk']},
+    {en:'The [teacher] is kind and helpful.',pl:'Nauczyciel jest miły i pomocny.',blank:'teacher',options:['teacher','book','pen','rubber']},
+    {en:'Put your things in your [bag].',pl:'Włóż swoje rzeczy do plecaka.',blank:'bag',options:['bag','desk','board','scissors']},
+    {en:'We write on the [board].',pl:'Piszemy na tablicy.',blank:'board',options:['board','book','ruler','pen']},
+    {en:'I lost my [rubber] again.',pl:'Znowu zgubiłem gumkę.',blank:'rubber',options:['rubber','pencil','scissors','desk']},
+  ],
+  colours:[
+    {en:'The sky is [blue].',pl:'Niebo jest niebieskie.',blank:'blue',options:['blue','red','green','pink']},
+    {en:'Grass is [green].',pl:'Trawa jest zielona.',blank:'green',options:['green','yellow','white','purple']},
+    {en:'The sun is [yellow].',pl:'Słońce jest żółte.',blank:'yellow',options:['yellow','orange','black','brown']},
+    {en:'A tomato is [red].',pl:'Pomidor jest czerwony.',blank:'red',options:['red','pink','blue','green']},
+    {en:'Snow is [white].',pl:'Śnieg jest biały.',blank:'white',options:['white','black','purple','orange']},
+  ],
+  body:[
+    {en:'I use my [eyes] to see.',pl:'Używam oczu do widzenia.',blank:'eyes',options:['eyes','nose','mouth','ear']},
+    {en:'She washed her [hands] before eating.',pl:'Umyła ręce przed jedzeniem.',blank:'hands',options:['hands','feet','hair','leg']},
+    {en:'My [nose] is cold in winter.',pl:'Mój nos jest zimny zimą.',blank:'nose',options:['nose','mouth','arm','head']},
+    {en:'He broke his [leg] playing football.',pl:'Złamał nogę grając w piłkę.',blank:'leg',options:['leg','arm','foot','hand']},
+    {en:'She has beautiful [hair].',pl:'Ma piękne włosy.',blank:'hair',options:['hair','ear','eye','mouth']},
+  ],
+  weather:[
+    {en:'It is [sunny] today.',pl:'Dziś jest słonecznie.',blank:'sunny',options:['sunny','rainy','cloudy','snowy']},
+    {en:'I need an umbrella when it is [rainy].',pl:'Potrzebuję parasola gdy jest deszczowo.',blank:'rainy',options:['rainy','windy','hot','foggy']},
+    {en:'In winter it is often [snowy].',pl:'Zimą często jest śnieżnie.',blank:'snowy',options:['snowy','sunny','hot','rainy']},
+    {en:'We can see a [rainbow] after rain.',pl:'Po deszczu możemy zobaczyć tęczę.',blank:'rainbow',options:['rainbow','storm','foggy','cloudy']},
+    {en:'It is very [hot] in summer.',pl:'Latem jest bardzo gorąco.',blank:'hot',options:['hot','cold','windy','cloudy']},
+  ],
+  clothes:[
+    {en:'She wears a red [dress].',pl:'Ona nosi czerwoną sukienkę.',blank:'dress',options:['dress','shirt','coat','jumper']},
+    {en:'Put on your [coat] it is cold.',pl:'Załóż płaszcz jest zimno.',blank:'coat',options:['coat','shoes','hat','socks']},
+    {en:'He wears a [hat] in summer.',pl:'Nosi czapkę latem.',blank:'hat',options:['hat','trousers','dress','jumper']},
+    {en:'My [shoes] are new.',pl:'Moje buty są nowe.',blank:'shoes',options:['shoes','gloves','scarf','socks']},
+    {en:'Wear your [scarf] it is windy.',pl:'Załóż szalik jest wietrznie.',blank:'scarf',options:['scarf','hat','coat','jumper']},
+  ],
+  home:[
+    {en:'Open the [door] please.',pl:'Otwórz drzwi proszę.',blank:'door',options:['door','window','bed','sofa']},
+    {en:'The [lamp] is on the table.',pl:'Lampa stoi na stole.',blank:'lamp',options:['lamp','chair','door','garden']},
+    {en:'We eat in the [kitchen].',pl:'Jemy w kuchni.',blank:'kitchen',options:['kitchen','bathroom','garden','bed']},
+    {en:'I sleep in my [bed].',pl:'Śpię w swoim łóżku.',blank:'bed',options:['bed','chair','sofa','window']},
+    {en:'The cat sits on the [sofa].',pl:'Kot siedzi na sofie.',blank:'sofa',options:['sofa','table','lamp','garden']},
+  ],
+  transport:[
+    {en:'We go to school by [bus].',pl:'Jedziemy do szkoły autobusem.',blank:'bus',options:['bus','plane','boat','tram']},
+    {en:'My dad drives a red [car].',pl:'Mój tata jeździ czerwonym samochodem.',blank:'car',options:['car','lorry','taxi','motorbike']},
+    {en:'The [train] arrives at nine.',pl:'Pociąg przyjeżdża o dziewiątej.',blank:'train',options:['train','plane','bicycle','bus']},
+    {en:'She rides her [bicycle] to the park.',pl:'Jedzie rowerem do parku.',blank:'bicycle',options:['bicycle','boat','tram','motorbike']},
+    {en:'We flew on a [plane] to London.',pl:'Polecieliśmy samolotem do Londynu.',blank:'plane',options:['plane','train','bus','boat']},
+  ],
+  numbers:[
+    {en:'I have [five] fingers on each hand.',pl:'Mam pięć palców na każdej ręce.',blank:'five',options:['five','two','eight','ten']},
+    {en:'A week has [seven] days.',pl:'Tydzień ma siedem dni.',blank:'seven',options:['seven','four','nine','six']},
+    {en:'There are [ten] pupils in the group.',pl:'W grupie jest dziesięcioro uczniów.',blank:'ten',options:['ten','three','six','one']},
+    {en:'My dog has [four] legs.',pl:'Mój pies ma cztery nogi.',blank:'four',options:['four','two','eight','six']},
+    {en:'I have [two] sisters.',pl:'Mam dwie siostry.',blank:'two',options:['two','nine','one','five']},
+  ],
+  time:[
+    {en:'School starts on [Monday].',pl:'Szkoła zaczyna się w poniedziałek.',blank:'Monday',options:['Monday','Friday','Sunday','Saturday']},
+    {en:'We rest on [Saturday].',pl:'Odpoczywamy w sobotę.',blank:'Saturday',options:['Saturday','Monday','Wednesday','Thursday']},
+    {en:'I wake up in the [morning].',pl:'Budzę się rano.',blank:'morning',options:['morning','night','afternoon','Sunday']},
+    {en:'Stars appear at [night].',pl:'Gwiazdy pojawiają się w nocy.',blank:'night',options:['night','morning','afternoon','Tuesday']},
+    {en:'[Friday] is my favourite day.',pl:'Piątek to mój ulubiony dzień.',blank:'Friday',options:['Friday','Monday','Wednesday','Sunday']},
+  ],
+  places:[
+    {en:'I want to go to the [zoo].',pl:'Chcę iść do zoo.',blank:'zoo',options:['zoo','cinema','beach','park']},
+    {en:'Is there a [museum] in town?',pl:'Czy jest muzeum w mieście?',blank:'museum',options:['museum','funfair','aquarium','ice rink']},
+    {en:'There is a [park] near my house.',pl:'Koło mojego domu jest park.',blank:'park',options:['park','swimming pool','cinema','water park']},
+    {en:'I want to go to the [cinema] on Saturday.',pl:'Chcę iść do kina w sobotę.',blank:'cinema',options:['cinema','aquarium','sports centre','funfair']},
+    {en:'There is an [aquarium] in the city centre.',pl:'W centrum miasta jest akwarium.',blank:'aquarium',options:['aquarium','beach','ice rink','zoo']},
+  ],
+};
+
+const SCRAMBLE={
+  animals:[
+    {words:['The','dog','barks','loudly'],pl:'Pies głośno szczeka.'},
+    {words:['My','cat','drinks','milk'],pl:'Mój kot pije mleko.'},
+    {words:['The','elephant','is','very','big'],pl:'Słoń jest bardzo duży.'},
+    {words:['Birds','can','fly','high'],pl:'Ptaki mogą latać wysoko.'},
+    {words:['I','love','my','rabbit'],pl:'Kocham mojego królika.'},
+  ],
+  food:[
+    {words:['I','eat','an','apple'],pl:'Jem jabłko.'},
+    {words:['The','bread','is','warm'],pl:'Chleb jest ciepły.'},
+    {words:['We','drink','cold','water'],pl:'Pijemy zimną wodę.'},
+    {words:['She','likes','chocolate','cake'],pl:'Ona lubi czekoladowe ciasto.'},
+    {words:['I','want','some','cheese'],pl:'Chcę trochę sera.'},
+  ],
+  family:[
+    {words:['My','mother','is','kind'],pl:'Moja mama jest miła.'},
+    {words:['My','brother','likes','football'],pl:'Mój brat lubi piłkę nożną.'},
+    {words:['Our','family','is','happy'],pl:'Nasza rodzina jest szczęśliwa.'},
+    {words:['My','grandfather','tells','stories'],pl:'Mój dziadek opowiada historyjki.'},
+    {words:['I','love','my','family'],pl:'Kocham moją rodzinę.'},
+  ],
+  school:[
+    {words:['Open','your','book','please'],pl:'Otwórz swoją książkę proszę.'},
+    {words:['The','teacher','is','helpful'],pl:'Nauczyciel jest pomocny.'},
+    {words:['I','need','a','pencil'],pl:'Potrzebuję ołówka.'},
+    {words:['We','learn','in','school'],pl:'Uczymy się w szkole.'},
+    {words:['I','forgot','my','bag'],pl:'Zapomniałem plecaka.'},
+  ],
+  colours:[
+    {words:['The','sky','is','blue'],pl:'Niebo jest niebieskie.'},
+    {words:['My','favourite','colour','is','green'],pl:'Mój ulubiony kolor to zielony.'},
+    {words:['She','wears','a','red','dress'],pl:'Ona nosi czerwoną sukienkę.'},
+    {words:['The','apple','is','yellow'],pl:'Jabłko jest żółte.'},
+    {words:['Snow','is','white','and','cold'],pl:'Śnieg jest biały i zimny.'},
+  ],
+  body:[
+    {words:['Wash','your','hands','now'],pl:'Umyj teraz ręce.'},
+    {words:['I','have','two','eyes'],pl:'Mam dwoje oczu.'},
+    {words:['My','head','hurts','today'],pl:'Dziś boli mnie głowa.'},
+    {words:['She','has','long','hair'],pl:'Ma długie włosy.'},
+    {words:['I','hurt','my','leg'],pl:'Skaleczyłem nogę.'},
+  ],
+  weather:[
+    {words:['It','is','very','sunny','today'],pl:'Dziś jest bardzo słonecznie.'},
+    {words:['Take','an','umbrella','it','is','rainy'],pl:'Weź parasol jest deszczowo.'},
+    {words:['The','wind','is','very','strong'],pl:'Wiatr jest bardzo silny.'},
+    {words:['I','love','playing','in','the','snow'],pl:'Uwielbiam bawić się w śniegu.'},
+    {words:['It','is','hot','and','sunny'],pl:'Jest gorąco i słonecznie.'},
+  ],
+  clothes:[
+    {words:['Put','on','your','coat'],pl:'Włóż swój płaszcz.'},
+    {words:['She','wears','a','blue','dress'],pl:'Ona nosi niebieską sukienkę.'},
+    {words:['My','shoes','are','new'],pl:'Moje buty są nowe.'},
+    {words:['I','lost','my','red','hat'],pl:'Zgubiłem swoją czerwoną czapkę.'},
+    {words:['He','wears','a','warm','jumper'],pl:'Nosi ciepły sweter.'},
+  ],
+  home:[
+    {words:['Please','open','the','window'],pl:'Proszę otwórz okno.'},
+    {words:['The','lamp','is','on','the','table'],pl:'Lampa stoi na stole.'},
+    {words:['We','eat','in','the','kitchen'],pl:'Jemy w kuchni.'},
+    {words:['My','bedroom','is','upstairs'],pl:'Moja sypialnia jest na górze.'},
+    {words:['The','cat','is','on','the','sofa'],pl:'Kot jest na sofie.'},
+  ],
+  transport:[
+    {words:['We','go','to','school','by','bus'],pl:'Jedziemy do szkoły autobusem.'},
+    {words:['The','train','is','very','fast'],pl:'Pociąg jest bardzo szybki.'},
+    {words:['She','rides','her','bicycle'],pl:'Ona jeździ na rowerze.'},
+    {words:['My','dad','has','a','red','car'],pl:'Mój tata ma czerwony samochód.'},
+    {words:['We','flew','to','London','by','plane'],pl:'Polecieliśmy do Londynu samolotem.'},
+  ],
+  numbers:[
+    {words:['I','have','five','cats'],pl:'Mam pięć kotów.'},
+    {words:['There','are','ten','pupils'],pl:'Jest dziesięcioro uczniów.'},
+    {words:['She','is','seven','years','old'],pl:'Ona ma siedem lat.'},
+    {words:['We','have','four','lessons','today'],pl:'Dziś mamy cztery lekcje.'},
+    {words:['I','can','count','to','ten'],pl:'Potrafię liczyć do dziesięciu.'},
+  ],
+  time:[
+    {words:['School','starts','on','Monday'],pl:'Szkoła zaczyna się w poniedziałek.'},
+    {words:['We','rest','on','Sunday'],pl:'Odpoczywamy w niedzielę.'},
+    {words:['I','wake','up','in','the','morning'],pl:'Budzę się rano.'},
+    {words:['Friday','is','my','favourite','day'],pl:'Piątek to mój ulubiony dzień.'},
+    {words:['The','stars','come','out','at','night'],pl:'Gwiazdy wychodzą w nocy.'},
+  ],
+  places:[
+    {words:['I','want','to','go','to','the','zoo'],pl:'Chcę iść do zoo.'},
+    {words:['Do','you','want','to','go','to','the','park'],pl:'Czy chcesz iść do parku?'},
+    {words:['There','is','a','cinema','in','town'],pl:'W mieście jest kino.'},
+    {words:['I','want','to','go','to','the','beach'],pl:'Chcę iść na plażę.'},
+    {words:['There','is','no','aquarium','here'],pl:'Nie ma tu akwarium.'},
+  ],
+};
+
+// STATE
+let currentMode='',currentTopic='',questions=[],qIndex=0,stars=0,correctCount=0,answerWords=[];
+
+function shuffle(a){return[...a].sort(()=>Math.random()-.5);}
+function pick(a,n){return shuffle(a).slice(0,n);}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  window.speechSynthesis.cancel();
+}
+
+// ============ AUDIO ============
+function speak(text, btnEl){
+  if(!window.speechSynthesis){return;}
+  window.speechSynthesis.cancel();
+  // If same button tapped while speaking, just stop
+  if(btnEl && btnEl.classList.contains('speaking')){
+    btnEl.classList.remove('speaking');
+    btnEl.innerHTML='<span class="speak-icon">🔊</span> Listen · Posłuchaj';
+    return;
+  }
+  // Reset all speak buttons
+  document.querySelectorAll('.speak-btn').forEach(b=>{
+    b.classList.remove('speaking');
+    b.innerHTML='<span class="speak-icon">🔊</span> Listen · Posłuchaj';
+  });
+  const utt=new SpeechSynthesisUtterance(text);
+  utt.lang='en-GB';
+  utt.rate=0.88;
+  utt.pitch=1.05;
+  // Try to use a British English voice if available
+  const voices=window.speechSynthesis.getVoices();
+  const gbVoice=voices.find(v=>v.lang==='en-GB')||voices.find(v=>v.lang.startsWith('en'));
+  if(gbVoice) utt.voice=gbVoice;
+  if(btnEl){
+    btnEl.classList.add('speaking');
+    btnEl.innerHTML='<span class="speak-icon">🔈</span> Playing... · Gra...';
+    utt.onend=()=>{
+      btnEl.classList.remove('speaking');
+      btnEl.innerHTML='<span class="speak-icon">🔊</span> Listen · Posłuchaj';
+    };
+    utt.onerror=()=>{
+      btnEl.classList.remove('speaking');
+      btnEl.innerHTML='<span class="speak-icon">🔊</span> Listen · Posłuchaj';
+    };
+  }
+  window.speechSynthesis.speak(utt);
+}
+
+function speakBtn(text){
+  return `<button class="speak-btn" onclick="speak('${text.replace(/'/g,"&#39;")}',this)"><span class="speak-icon">🔊</span> Listen · Posłuchaj</button>`;
+}
+
+// Star background
+(function(){
+  const bg=document.getElementById('starsBg');
+  for(let i=0;i<60;i++){
+    const d=document.createElement('div');
+    d.className='star-dot';
+    const s=Math.random()*3+1;
+    d.style.cssText=`width:${s}px;height:${s}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s;`;
+    bg.appendChild(d);
+  }
+})();
+
+function selectMode(mode){
+  currentMode=mode;
+  document.getElementById('topicHeader').className='topic-header header-'+mode;
+  const names={explorer:'🌱 Explorer · Odkrywca',adventurer:'🚀 Adventurer · Podróżnik',champion:'⚡ Champion · Mistrz'};
+  document.getElementById('topicHeaderTitle').textContent=names[mode];
+  const grid=document.getElementById('topicGrid');
+  grid.innerHTML='';
+  TOPICS.forEach(t=>{
+    const c=document.createElement('div');
+    c.className='topic-card';
+    c.innerHTML=`<span class="topic-emoji">${t.emoji}</span><div class="topic-en">${t.en}</div><div class="topic-pl">${t.pl}</div>`;
+    c.onclick=()=>startGame(t.id);
+    grid.appendChild(c);
+  });
+  showScreen('topics');
+}
+
+function startGame(topicId){
+  currentTopic=topicId;
+  stars=0;correctCount=0;qIndex=0;answerWords=[];
+  const vocab=VOCAB[topicId];
+  const sents=SENTENCES[topicId]||[];
+  const scrambls=SCRAMBLE[topicId]||[];
+
+  if(currentMode==='explorer'){
+    const a=pick(vocab,4).map(v=>({type:'pic',...v}));
+    const b=pick(vocab,4).map(v=>({type:'translate',...v,choices:makeChoices(v,vocab)}));
+    const c=pick(vocab.filter(w=>w.en.length<=5),2).map(v=>({type:'spell-copy',...v}));
+    questions=shuffle([...a,...b,...c]);
+  } else if(currentMode==='adventurer'){
+    const a=pick(sents,4).map(s=>({type:'gap',...s}));
+    const b=pick(vocab,4).map(v=>({type:'match',...v,choices:makeChoices(v,vocab)}));
+    const c=pick(vocab,2).map(v=>({type:'spell-gap',...v}));
+    questions=shuffle([...a,...b,...c]);
+  } else {
+    const a=pick(scrambls,4).map(s=>({type:'scramble',...s}));
+    const b=pick(vocab,4).map(v=>({type:'type',...v}));
+    const c=pick(vocab,2).map(v=>({type:'spell-scaffold',...v}));
+    questions=shuffle([...a,...b,...c]);
+  }
+
+  document.getElementById('gameHeader').className='game-header header-'+currentMode;
+  const t=TOPICS.find(x=>x.id===topicId);
+  document.getElementById('lessonName').textContent=t.emoji+' '+t.en+' · '+t.pl;
+  showScreen('game');
+  renderQ();
+}
+
+function makeChoices(correct,vocab){
+  const others=vocab.filter(v=>v.en!==correct.en);
+  return shuffle([correct,...pick(others,3)]);
+}
+
+function renderQ(){
+  const q=questions[qIndex];
+  const total=questions.length;
+  document.getElementById('progressText').textContent=`Question ${qIndex+1} of ${total} · Pytanie ${qIndex+1} z ${total}`;
+  document.getElementById('progressFill').style.width=`${(qIndex/total)*100}%`;
+  document.getElementById('starCount').textContent=stars;
+  answerWords=[];
+
+  const bc=currentMode+'-badge', btn=currentMode+'-btn';
+  let html='';
+
+  if(q.type==='pic'){
+    const all=VOCAB[currentTopic];
+    const choices=makeChoices(q,all);
+    html=`
+      <span class="q-type-badge ${bc}">🖼️ Match · Dopasuj</span>
+      <p class="q-prompt">Which English word is this? · Które angielskie słowo to jest?</p>
+      <span class="q-emoji-big">${q.emoji}</span>
+      <p class="q-pl">${q.pl}</p>
+      ${speakBtn(q.en)}
+      <div class="choices">
+        ${choices.map(c=>`<button class="choice-btn" onclick="checkChoice(this,'${c.en}','${q.en}')"><span class="choice-en">${c.en}</span></button>`).join('')}
+      </div>
+      <div class="feedback" id="feedback"><span class="fb-icon"></span><span id="fbText"></span></div>
+      <button class="next-btn ${btn}" id="nextBtn" onclick="nextQ()">Next · Dalej →</button>`;
+  } else if(q.type==='translate'){
+    html=`
+      <span class="q-type-badge ${bc}">🇵🇱→🇬🇧 Translate · Przetłumacz</span>
+      <p class="q-prompt">What is the English word? · Jak to jest po angielsku?</p>
+      <span class="q-emoji-big">${q.emoji}</span>
+      <p class="q-pl">${q.pl}</p>
+      ${speakBtn(q.en)}
+      <div class="choices">
+        ${q.choices.map(c=>`<button class="choice-btn" onclick="checkChoice(this,'${c.en}','${q.en}')"><span class="choice-en">${c.en}</span></button>`).join('')}
+      </div>
+      <div class="feedback" id="feedback"><span class="fb-icon"></span><span id="fbText"></span></div>
+      <button class="next-btn ${btn}" id="nextBtn" onclick="nextQ()">Next · Dalej →</button>`;
+  } else if(q.type==='gap'){
+    const displayed=q.en.replace('['+q.blank+']','______');
+    html=`
+      <span class="q-type-badge ${bc}">✏️ Fill the Gap · Uzupełnij</span>
+      <p class="q-prompt">Choose the missing word: · Wybierz brakujące słowo:</p>
+      <p class="q-pl">${q.pl}</p>
+      <p class="q-en-hint">${displayed}</p>
+      ${speakBtn(q.en.replace('[','').replace(']',''))}
+      <div class="choices">
+        ${q.options.map(o=>`<button class="choice-btn" onclick="checkChoice(this,'${o}','${q.blank}')"><span class="choice-en">${o}</span></button>`).join('')}
+      </div>
+      <div class="feedback" id="feedback"><span class="fb-icon"></span><span id="fbText"></span></div>
+      <button class="next-btn ${btn}" id="nextBtn" onclick="nextQ()">Next · Dalej →</button>`;
+  } else if(q.type==='match'){
+    html=`
+      <span class="q-type-badge ${bc}">🔗 Match · Dopasuj</span>
+      <p class="q-prompt">Pick the right English word: · Wybierz właściwe angielskie słowo:</p>
+      <span class="q-emoji-big">${q.emoji}</span>
+      <p class="q-pl" style="font-size:26px">${q.pl}</p>
+      ${speakBtn(q.en)}
+      <div class="choices">
+        ${q.choices.map(c=>`<button class="choice-btn" onclick="checkChoice(this,'${c.en}','${q.en}')"><span class="choice-en">${c.en}</span><span class="choice-pl">${c.pl}</span></button>`).join('')}
+      </div>
+      <div class="feedback" id="feedback"><span class="fb-icon"></span><span id="fbText"></span></div>
+      <button class="next-btn ${btn}" id="nextBtn" onclick="nextQ()">Next · Dalej →</button>`;
+  } else if(q.type==='type'){
+    html=`
+      <span class="q-type-badge ${bc}">⌨️ Spell It! · Przeliteruj</span>
+      <p class="q-prompt">Translate into English: · Przetłumacz na angielski:</p>
+      <span class="q-emoji-big">${q.emoji}</span>
+      <p class="q-pl">${q.pl}</p>
+      ${speakBtn(q.en)}
+      <div class="type-area">
+        <input class="type-input" id="typeInput" placeholder="Type in English..." autocomplete="off" onkeydown="if(event.key==='Enter')checkType()">
+        <button class="submit-btn ${btn}" onclick="checkType()">Check · Sprawdź ✓</button>
+      </div>
+      <div class="feedback" id="feedback"><span class="fb-icon"></span><span id="fbText"></span></div>
+      <button class="next-btn ${btn}" id="nextBtn" onclick="nextQ()">Next · Dalej →</button>`;
+  } else if(q.type==='scramble'){
+    html=`
+      <span class="q-type-badge ${bc}">🔀 Build the Sentence · Ułóż zdanie</span>
+      <p class="q-prompt">Put the words in order: · Ułóż słowa w zdanie:</p>
+      <p class="q-pl">${q.pl}</p>
+      ${speakBtn(q.words.join(' '))}
+      <div class="word-builder">
+        <div class="answer-slots" id="answerSlots"><span class="slot-hint">Tap words below · Kliknij słowa poniżej</span></div>
+        <div class="word-bank" id="wordBank"></div>
+        <button class="submit-btn ${btn}" id="scrambleSubmit" onclick="checkScramble()">Check · Sprawdź ✓</button>
+      </div>
+      <div class="feedback" id="feedback"><span class="fb-icon"></span><span id="fbText"></span></div>
+      <button class="next-btn ${btn}" id="nextBtn" onclick="nextQ()">Next · Dalej →</button>`;
+
+  } else if(q.type==='spell-copy'){
+    // Explorer: see the word + emoji + hear it, then cover and type it
+    html=`
+      <span class="q-type-badge ${bc}">✍️ Spelling · Literowanie</span>
+      <p class="q-prompt">Look, listen, then type the word! · Patrz, słuchaj, a potem napisz słowo!</p>
+      <span class="q-emoji-big">${q.emoji}</span>
+      <p class="q-pl">${q.pl}</p>
+      <div style="background:#eef2ff;border-radius:14px;padding:14px 18px;text-align:center;margin-bottom:14px;font-family:'Fredoka One',cursive;font-size:28px;color:#4338ca;letter-spacing:3px;" id="wordDisplay">${q.en}</div>
+      ${speakBtn(q.en)}
+      <div class="type-area" style="margin-top:8px;">
+        <input class="type-input" id="typeInput" placeholder="Type the word... · Wpisz słowo..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')checkType()">
+        <button class="submit-btn ${btn}" onclick="checkType()">Check · Sprawdź ✓</button>
+      </div>
+      <div class="feedback" id="feedback"><span class="fb-icon"></span><span id="fbText"></span></div>
+      <button class="next-btn ${btn}" id="nextBtn" onclick="nextQ()">Next · Dalej →</button>`;
+
+  } else if(q.type==='spell-gap'){
+    // Adventurer: emoji + Polish shown, type the English word, no choices
+    html=`
+      <span class="q-type-badge ${bc}">✍️ Spelling · Literowanie</span>
+      <p class="q-prompt">Spell the English word! · Przeliteruj angielskie słowo!</p>
+      <span class="q-emoji-big">${q.emoji}</span>
+      <p class="q-pl" style="font-size:24px;margin-bottom:4px;">${q.pl}</p>
+      <p style="font-size:13px;color:#a78bfa;font-weight:700;margin-bottom:14px;">Hint: ${q.en.length} letters · Wskazówka: ${q.en.length} liter</p>
+      ${speakBtn(q.en)}
+      <div class="type-area">
+        <input class="type-input" id="typeInput" placeholder="Type in English... · Wpisz po angielsku..." autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')checkType()">
+        <button class="submit-btn ${btn}" onclick="checkType()">Check · Sprawdź ✓</button>
+      </div>
+      <div class="feedback" id="feedback"><span class="fb-icon"></span><span id="fbText"></span></div>
+      <button class="next-btn ${btn}" id="nextBtn" onclick="nextQ()">Next · Dalej →</button>`;
+
+  } else if(q.type==='spell-scaffold'){
+    // Champion: jumbled letters shown as clickable tiles to build the word
+    const scrambledLetters=shuffle([...q.en]);
+    html=`
+      <span class="q-type-badge ${bc}">✍️ Spelling · Literowanie</span>
+      <p class="q-prompt">Arrange the letters to spell the word! · Ułóż litery żeby przeliterować słowo!</p>
+      <span class="q-emoji-big">${q.emoji}</span>
+      <p class="q-pl" style="font-size:22px;margin-bottom:14px;">${q.pl}</p>
+      ${speakBtn(q.en)}
+      <div class="word-builder" style="margin-top:8px;">
+        <div class="answer-slots" id="answerSlots" style="min-height:56px;font-size:22px;letter-spacing:2px;"><span class="slot-hint">Tap letters · Kliknij litery</span></div>
+        <div class="word-bank" id="wordBank" style="justify-content:center;"></div>
+        <button class="submit-btn ${btn}" id="scrambleSubmit" onclick="checkLetterScramble('${q.en}')">Check · Sprawdź ✓</button>
+      </div>
+      <div class="feedback" id="feedback"><span class="fb-icon"></span><span id="fbText"></span></div>
+      <button class="next-btn ${btn}" id="nextBtn" onclick="nextQ()">Next · Dalej →</button>`;
+  }
+
+  document.getElementById('qCard').innerHTML=html;
+
+  if(q.type==='scramble'){
+    const bank=document.getElementById('wordBank');
+    shuffle(q.words).forEach(w=>{
+      const t=document.createElement('div');
+      t.className='word-tile bank-tile';
+      t.textContent=w;
+      t.dataset.word=w;
+      t.onclick=()=>moveToAnswer(t);
+      bank.appendChild(t);
+    });
+  }
+
+  if(q.type==='spell-scaffold'){
+    const bank=document.getElementById('wordBank');
+    shuffle([...q.en]).forEach((letter,i)=>{
+      const t=document.createElement('div');
+      t.className='word-tile bank-tile';
+      t.textContent=letter;
+      t.dataset.word=letter;
+      t.dataset.idx=i;
+      t.style.minWidth='40px';t.style.textAlign='center';t.style.fontSize='20px';
+      t.onclick=()=>moveToAnswer(t);
+      bank.appendChild(t);
+    });
+  }
+}
+
+function checkChoice(btn,chosen,correct){
+  document.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);
+  btn.classList.add(chosen===correct?'correct':'wrong');
+  if(chosen!==correct){
+    document.querySelectorAll('.choice-btn').forEach(b=>{
+      if(b.querySelector('.choice-en')&&b.querySelector('.choice-en').textContent===correct) b.classList.add('correct');
+    });
+  }
+  showFeedback(chosen===correct,correct);
+  if(chosen===correct){stars++;correctCount++;}
+  document.getElementById('starCount').textContent=stars;
+}
+
+function checkType(){
+  const inp=document.getElementById('typeInput');
+  const q=questions[qIndex];
+  const val=inp.value.trim().toLowerCase();
+  const ok=val===q.en.toLowerCase();
+  inp.disabled=true;
+  inp.classList.add(ok?'correct':'wrong');
+  document.querySelector('.submit-btn').disabled=true;
+  showFeedback(ok,q.en);
+  if(ok){stars++;correctCount++;document.getElementById('starCount').textContent=stars;}
+}
+
+function moveToAnswer(tile){
+  const slots=document.getElementById('answerSlots');
+  const hint=slots.querySelector('.slot-hint');
+  if(hint)hint.remove();
+  const w=tile.dataset.word;
+  answerWords.push(w);
+  tile.remove();
+  const at=document.createElement('div');
+  at.className='word-tile answer-tile';
+  at.textContent=w;
+  at.dataset.word=w;
+  at.onclick=()=>{
+    at.remove();
+    const idx=answerWords.lastIndexOf(w);
+    if(idx>-1)answerWords.splice(idx,1);
+    const bt=document.createElement('div');
+    bt.className='word-tile bank-tile';
+    bt.textContent=w;
+    bt.dataset.word=w;
+    bt.onclick=()=>moveToAnswer(bt);
+    document.getElementById('wordBank').appendChild(bt);
+    if(answerWords.length===0){
+      slots.innerHTML='<span class="slot-hint">Tap words below · Kliknij słowa poniżej</span>';
+    }
+  };
+  slots.appendChild(at);
+}
+
+function checkScramble(){
+  const q=questions[qIndex];
+  const ok=answerWords.join(' ').toLowerCase()===q.words.join(' ').toLowerCase();
+  document.getElementById('scrambleSubmit').disabled=true;
+  document.querySelectorAll('.word-tile').forEach(t=>t.onclick=null);
+  showFeedback(ok,q.words.join(' '));
+  if(ok){stars++;correctCount++;document.getElementById('starCount').textContent=stars;}
+  answerWords=[];
+}
+
+function checkLetterScramble(correctWord){
+  const userWord=answerWords.join('').toLowerCase();
+  const ok=userWord===correctWord.toLowerCase();
+  document.getElementById('scrambleSubmit').disabled=true;
+  document.querySelectorAll('.word-tile').forEach(t=>t.onclick=null);
+  // Speak the correct word on reveal
+  if(!ok) speak(correctWord, null);
+  showFeedback(ok, correctWord);
+  if(ok){stars++;correctCount++;document.getElementById('starCount').textContent=stars;}
+  answerWords=[];
+}
+
+function showFeedback(ok,correctAnswer){
+  const fb=document.getElementById('feedback');
+  const nbtn=document.getElementById('nextBtn');
+  fb.classList.add('show');
+  if(ok){
+    fb.className='feedback show correct-fb';
+    const msgs=['⭐ Brilliant! · Wspaniale!','🌟 Well done! · Świetnie!','🎉 Correct! · Dobrze!','✨ Amazing! · Niesamowite!','🥳 Perfect! · Idealnie!'];
+    fb.querySelector('.fb-icon').textContent='✅';
+    document.getElementById('fbText').textContent=msgs[Math.floor(Math.random()*msgs.length)];
+  } else {
+    fb.className='feedback show wrong-fb';
+    fb.querySelector('.fb-icon').textContent='❌';
+    document.getElementById('fbText').textContent=`The answer is: "${correctAnswer}" · Odpowiedź to: "${correctAnswer}"`;
+  }
+  nbtn.classList.add('show');
+}
+
+function nextQ(){
+  qIndex++;
+  answerWords=[];
+  if(qIndex>=questions.length) showResults();
+  else renderQ();
+}
+
+function showResults(){
+  document.getElementById('progressFill').style.width='100%';
+  const total=questions.length;
+  const pct=Math.round((correctCount/total)*100);
+  let trophy='💪',title='Keep trying!',pl='Nie poddawaj się!';
+  if(pct===100){trophy='🌟';title='Perfect!';pl='Idealnie!';}
+  else if(pct>=75){trophy='🏆';title='Excellent!';pl='Doskonale!';}
+  else if(pct>=50){trophy='🥈';title='Good job!';pl='Dobra robota!';}
+  document.getElementById('resultsTrophy').textContent=trophy;
+  document.getElementById('resultsTitle').textContent=title;
+  document.getElementById('resultsPl').textContent=pl;
+  document.getElementById('starsEarned').textContent='⭐ '+stars;
+  document.getElementById('scoreDetail').textContent=`${correctCount} / ${total} correct · poprawnych`;
+  showScreen('results');
+  if(pct>=50)confetti();
+}
+
+function playAgain(){
+  if(window._readingResultsMode){
+    window._readingResultsMode=false;
+    startReading();
+  } else {
+    startGame(currentTopic);
+  }
+}
+
+// ============ READING CORNER ============
+// Each topic holds an ARRAY of text objects: {title, text, glossary, questions}
+const READING_TEXTS={
+
+  // EXPLORER — Phase 2 phonics. CVC sentences, yes/no or 2 options, bilingual.
+  explorer:{
+    animals:[
+      {title:'The Cat and the Hat',text:'The cat has a hat. 🐱🎩 The cat sat on a mat. The cat is fat and happy.',glossary:{hat:'czapka',sat:'siedział',mat:'dywanik',fat:'gruby',happy:'szczęśliwy'},questions:[{q:'Does the cat have a hat? · Czy kot ma czapkę?',pl:'Czy kot ma czapkę?',type:'choice',options:['Yes · Tak','No · Nie'],answer:0},{q:'Where did the cat sit? · Gdzie siedział kot?',pl:'Gdzie siedział kot?',type:'choice',options:['On a mat · Na dywanik','On a bed · Na łóżku'],answer:0},{q:'Is the cat happy? · Czy kot jest szczęśliwy?',pl:'Czy kot jest szczęśliwy?',type:'choice',options:['Yes · Tak','No · Nie'],answer:0}]},
+      {title:'The Dog on the Log',text:'The dog is on the log. 🐶 The dog can run and hop. The dog is tan.',glossary:{log:'kłoda',run:'biegać',hop:'skakać',tan:'brązowy'},questions:[{q:'Where is the dog? · Gdzie jest pies?',pl:'Gdzie jest pies?',type:'choice',options:['On the log · Na kłodzie','In the mud · W błocie'],answer:0},{q:'Can the dog hop? · Czy pies może skakać?',pl:'Czy pies może skakać?',type:'choice',options:['Yes · Tak','No · Nie'],answer:0},{q:'What colour is the dog? · Jakiego koloru jest pies?',pl:'Jakiego koloru jest pies?',type:'choice',options:['Tan · Brązowy','Black · Czarny'],answer:0}]},
+      {title:'The Big Red Hen',text:'The red hen is big. 🐔 The hen has a chick. The chick is little.',glossary:{hen:'kura',big:'duży',chick:'pisklę',little:'mały'},questions:[{q:'What colour is the hen? · Jakiego koloru jest kura?',pl:'Jakiego koloru jest kura?',type:'choice',options:['Red · Czerwona','Blue · Niebieska'],answer:0},{q:'Does the hen have a chick? · Czy kura ma pisklę?',pl:'Czy kura ma pisklę?',type:'choice',options:['Yes · Tak','No · Nie'],answer:0},{q:'Is the chick big or little? · Czy pisklę jest duże czy małe?',pl:'Czy pisklę jest duże czy małe?',type:'choice',options:['Big · Duże','Little · Małe'],answer:1}]},
+      {title:'The Pet Rat',text:'I have a pet rat. 🐭 The rat is in the tub. The rat is wet!',glossary:{pet:'domowy',rat:'szczur',tub:'wanna',wet:'mokry'},questions:[{q:'What pet does the child have? · Jakie zwierzątko ma dziecko?',pl:'Jakie zwierzątko ma dziecko?',type:'choice',options:['A rat · Szczura','A cat · Kota'],answer:0},{q:'Where is the rat? · Gdzie jest szczur?',pl:'Gdzie jest szczur?',type:'choice',options:['In the tub · W wannie','On the mat · Na dywanik'],answer:0},{q:'Is the rat wet? · Czy szczur jest mokry?',pl:'Czy szczur jest mokry?',type:'choice',options:['Yes · Tak','No · Nie'],answer:0}]},
+    ],
+    food:[
+      {title:'The Hen and the Egg',text:'The hen has an egg. 🐔🥚 The egg is in a red box. The hen is big.',glossary:{hen:'kura',egg:'jajko',box:'pudełko',big:'duży'},questions:[{q:'What does the hen have? · Co ma kura?',pl:'Co ma kura?',type:'choice',options:['An egg · Jajko','A hat · Czapkę'],answer:0},{q:'What colour is the box? · Jakiego koloru jest pudełko?',pl:'Jakiego koloru jest pudełko?',type:'choice',options:['Red · Czerwone','Blue · Niebieskie'],answer:0},{q:'Is the hen big or small? · Czy kura jest duża czy mała?',pl:'Czy kura jest duża czy mała?',type:'choice',options:['Big · Duża','Small · Mała'],answer:0}]},
+      {title:'The Hot Bun',text:'Mum has a hot bun. 🧁 The bun is on the pan. The bun is for me!',glossary:{bun:'bułka',hot:'gorąca',pan:'patelnia'},questions:[{q:'Who has the bun? · Kto ma bułkę?',pl:'Kto ma bułkę?',type:'choice',options:['Mum · Mama','Dad · Tata'],answer:0},{q:'Is the bun hot or cold? · Czy bułka jest gorąca czy zimna?',pl:'Czy bułka jest gorąca czy zimna?',type:'choice',options:['Hot · Gorąca','Cold · Zimna'],answer:0},{q:'Where is the bun? · Gdzie jest bułka?',pl:'Gdzie jest bułka?',type:'choice',options:['On the pan · Na patelni','In the box · W pudełku'],answer:0}]},
+      {title:'The Big Pot',text:'Dad has a big pot. 🥘 The pot is on the hob. The pot is hot!',glossary:{pot:'garnek',big:'duży',hob:'kuchenka',hot:'gorący'},questions:[{q:'Who has the pot? · Kto ma garnek?',pl:'Kto ma garnek?',type:'choice',options:['Dad · Tata','Mum · Mama'],answer:0},{q:'Is the pot big or small? · Czy garnek jest duży czy mały?',pl:'Czy garnek jest duży czy mały?',type:'choice',options:['Big · Duży','Small · Mały'],answer:0},{q:'Is the pot hot? · Czy garnek jest gorący?',pl:'Czy garnek jest gorący?',type:'choice',options:['Yes · Tak','No · Nie'],answer:0}]},
+    ],
+    school:[
+      {title:'The Red Pen',text:'The pen is red. ✏️ The pen is on the desk. I can write with the pen.',glossary:{pen:'długopis',red:'czerwony',desk:'ławka',write:'pisać'},questions:[{q:'What colour is the pen? · Jakiego koloru jest długopis?',pl:'Jakiego koloru jest długopis?',type:'choice',options:['Red · Czerwony','Black · Czarny'],answer:0},{q:'Where is the pen? · Gdzie jest długopis?',pl:'Gdzie jest długopis?',type:'choice',options:['On the desk · Na ławce','In the bag · W plecaku'],answer:0},{q:'Can I write with the pen? · Czy mogę pisać tym długopisem?',pl:'Czy mogę pisać tym długopisem?',type:'choice',options:['Yes · Tak','No · Nie'],answer:0}]},
+      {title:'The Red Hen on the Bus',text:'The red hen is on the bus. 🐔🚌 The bus is big. The hen has a pen.',glossary:{hen:'kura',bus:'autobus',big:'duży',pen:'długopis'},questions:[{q:'Where is the hen? · Gdzie jest kura?',pl:'Gdzie jest kura?',type:'choice',options:['On the bus · W autobusie','In a box · W pudełku'],answer:0},{q:'Is the bus big? · Czy autobus jest duży?',pl:'Czy autobus jest duży?',type:'choice',options:['Yes · Tak','No · Nie'],answer:0},{q:'What does the hen have? · Co ma kura?',pl:'Co ma kura?',type:'choice',options:['A pen · Długopis','A hat · Czapkę'],answer:0}]},
+      {title:'Mum Has a Bag',text:'Mum has a bag. 👜 Dad has a map. The bag and the map are big.',glossary:{bag:'torba',map:'mapa',big:'duże'},questions:[{q:'What does Mum have? · Co ma mama?',pl:'Co ma mama?',type:'choice',options:['A bag · Torbę','A map · Mapę'],answer:0},{q:'What does Dad have? · Co ma tata?',pl:'Co ma tata?',type:'choice',options:['A map · Mapę','A bag · Torbę'],answer:0},{q:'Are they big or small? · Czy są duże czy małe?',pl:'Czy są duże czy małe?',type:'choice',options:['Big · Duże','Small · Małe'],answer:0}]},
+    ],
+    weather:[
+      {title:'The Hot Sun',text:'The sun is hot. ☀️ The dog is on the log. The dog can run and hop.',glossary:{sun:'słońce',hot:'gorące',log:'kłoda',run:'biegać',hop:'skakać'},questions:[{q:'Is the sun hot? · Czy słońce jest gorące?',pl:'Czy słońce jest gorące?',type:'choice',options:['Yes · Tak','No · Nie'],answer:0},{q:'Where is the dog? · Gdzie jest pies?',pl:'Gdzie jest pies?',type:'choice',options:['On the log · Na kłodzie','In the mud · W błocie'],answer:0},{q:'What can the dog do? · Co potrafi pies?',pl:'Co potrafi pies?',type:'choice',options:['Run and hop · Biegać i skakać','Swim and fly · Pływać i latać'],answer:0}]},
+      {title:'The Wet Pup',text:'It is wet. 🌧️ The pup is wet too. The pup ran in the mud.',glossary:{wet:'mokry',pup:'szczeniak',ran:'biegał',mud:'błoto'},questions:[{q:'Is it wet? · Czy jest mokro?',pl:'Czy jest mokro?',type:'choice',options:['Yes · Tak','No · Nie'],answer:0},{q:'Who is wet? · Kto jest mokry?',pl:'Kto jest mokry?',type:'choice',options:['The pup · Szczeniak','The cat · Kot'],answer:0},{q:'Where did the pup run? · Gdzie biegał szczeniak?',pl:'Gdzie biegał szczeniak?',type:'choice',options:['In the mud · W błocie','On the mat · Na dywanik'],answer:0}]},
+    ],
+    family:[
+      {title:'Mum and Dad',text:'My name is Ola. 👧 I have a mum and a dad. I love my family. ❤️',glossary:{name:'imię',mum:'mama',dad:'tata',love:'kocham',family:'rodzina'},questions:[{q:'What is her name? · Jak ona ma na imię?',pl:'Jak ona ma na imię?',type:'choice',options:['Mia','Ola'],answer:1},{q:'Who does she have? · Kogo ona ma?',pl:'Kogo ona ma?',type:'choice',options:['A mum and a dad · Mamę i tatę','A sister and a brother · Siostrę i brata'],answer:0},{q:'Does she love her family? · Czy ona kocha swoją rodzinę?',pl:'Czy ona kocha swoją rodzinę?',type:'choice',options:['Yes · Tak','No · Nie'],answer:0}]},
+      {title:'Ben and His Dog',text:'Ben has a dog. 🐶 The dog is tan. Ben and the dog run and hop.',glossary:{dog:'pies',tan:'brązowy',run:'biegać',hop:'skakać'},questions:[{q:'What does Ben have? · Co ma Ben?',pl:'Co ma Ben?',type:'choice',options:['A dog · Pies','A cat · Kot'],answer:0},{q:'What colour is the dog? · Jakiego koloru jest pies?',pl:'Jakiego koloru jest pies?',type:'choice',options:['Tan · Brązowy','Black · Czarny'],answer:0},{q:'What do Ben and the dog do? · Co robią Ben i pies?',pl:'Co robią Ben i pies?',type:'choice',options:['Run and hop · Biegają i skaczą','Sit and nap · Siedzą i drzemią'],answer:0}]},
+    ],
+  },
+
+  // ADVENTURER — Year 2. Simple past, adjectives, connectives (and/but/because/so). 3-option Qs, bilingual.
+  adventurer:{
+    animals:[
+      {title:'A Day at the Zoo',text:'Last Sunday, Mia went to the zoo. 🦁 She saw a big lion and a funny monkey. The monkey jumped up and down. Mia was happy because she loves animals. She wants to go again next week.',glossary:{went:'poszła',saw:'zobaczyła',jumped:'skakała',loves:'kocha',again:'znowu'},questions:[{q:'Where did Mia go? · Gdzie poszła Mia?',pl:'Gdzie poszła Mia?',type:'choice',options:['To the park · Do parku','To the zoo · Do zoo','To school · Do szkoły'],answer:1},{q:'What did the monkey do? · Co robiła małpa?',pl:'Co robiła małpa?',type:'choice',options:['It slept · Spała','It jumped up and down · Skakała','It ran away · Uciekła'],answer:1},{q:'Why was Mia happy? · Dlaczego Mia była szczęśliwa?',pl:'Dlaczego Mia była szczęśliwa?',type:'choice',options:['She got ice cream · Dostała lody','She loves animals · Kocha zwierzęta','She won a prize · Wygrała nagrodę'],answer:1},{q:'When does she want to go again? · Kiedy chce znowu iść?',pl:'Kiedy chce znowu iść?',type:'choice',options:['Tomorrow · Jutro','Next week · W przyszłym tygodniu','Next year · Za rok'],answer:1}]},
+      {title:'My Cat Cleo',text:'My cat is called Cleo. 🐱 She is small and grey with green eyes. Every morning she sits on my bed and wakes me up. Cleo loves to eat fish but she does not like dogs. She is my best friend.',glossary:{called:'nazywa się',grey:'szara',wakes:'budzi',loves:'kocha',friend:'przyjaciel'},questions:[{q:'What colour is Cleo? · Jakiego koloru jest Cleo?',pl:'Jakiego koloru jest Cleo?',type:'choice',options:['Black · Czarna','Grey · Szara','Orange · Pomarańczowa'],answer:1},{q:'What does Cleo do in the morning? · Co robi Cleo rano?',pl:'Co robi Cleo rano?',type:'choice',options:['She sleeps · Śpi','She sits on the bed and wakes me up · Siada na łóżku i budzi mnie','She goes outside · Wychodzi'],answer:1},{q:'What does Cleo love to eat? · Co Cleo lubi jeść?',pl:'Co Cleo lubi jeść?',type:'choice',options:['Chicken · Kurczak','Fish · Ryba','Milk · Mleko'],answer:1},{q:'Does Cleo like dogs? · Czy Cleo lubi psy?',pl:'Czy Cleo lubi psy?',type:'choice',options:['Yes she does · Tak','No she does not · Nie','Only small dogs · Tylko małe'],answer:1}]},
+      {title:'The Lost Rabbit',text:"On Monday, Tom's rabbit ran away. 🐰 Tom looked in the garden and in the shed but he could not find it. He was very sad and worried. Then his sister called out — the rabbit was under the bed! Tom was so happy and gave the rabbit a big hug.",glossary:{rabbit:'królik',shed:'szopa',worried:'zaniepokojony',called:'zawołała',hug:'przytulenie'},questions:[{q:'Where did Tom look? · Gdzie szukał Tom?',pl:'Gdzie szukał Tom?',type:'choice',options:['In the kitchen and bathroom · W kuchni i łazience','In the garden and the shed · W ogrodzie i szopie','Under the bed only · Tylko pod łóżkiem'],answer:1},{q:'How did Tom feel when he could not find the rabbit? · Jak czuł się Tom?',pl:'Jak czuł się Tom?',type:'choice',options:['Happy · Szczęśliwy','Sad and worried · Smutny i zaniepokojony','Angry · Zły'],answer:1},{q:'Where was the rabbit? · Gdzie był królik?',pl:'Gdzie był królik?',type:'choice',options:['In the shed · W szopie','In the garden · W ogrodzie','Under the bed · Pod łóżkiem'],answer:2},{q:'How did Tom feel at the end? · Jak czuł się Tom na końcu?',pl:'Jak czuł się Tom na końcu?',type:'choice',options:['Still sad · Nadal smutny','Very happy · Bardzo szczęśliwy','A bit worried · Trochę zaniepokojony'],answer:1}]},
+    ],
+    food:[
+      {title:'Baking a Cake',text:'On Saturday, Tom helped his mum make a cake. 🎂 They put in eggs, milk, and flour. The cake smelled lovely. Tom ate two big slices because he was very hungry. He said it was the best cake ever!',glossary:{helped:'pomagał',flour:'mąka',smelled:'pachniało',lovely:'cudownie',slices:'kawałki',hungry:'głodny'},questions:[{q:'What did Tom and his mum make? · Co zrobili?',pl:'Co zrobili?',type:'choice',options:['A pizza · Pizzę','A cake · Ciasto','A soup · Zupę'],answer:1},{q:'What did they put in the cake? · Co włożyli do ciasta?',pl:'Co włożyli do ciasta?',type:'choice',options:['Eggs milk and flour · Jajka mleko i mąkę','Cheese and tomato · Ser i pomidor','Sugar and water · Cukier i wodę'],answer:0},{q:'Why did Tom eat two slices? · Dlaczego Tom zjadł dwa kawałki?',pl:'Dlaczego Tom zjadł dwa kawałki?',type:'choice',options:['It was free · Było za darmo','He was very hungry · Był bardzo głodny','His mum said to · Mama kazała'],answer:1},{q:'What did Tom say about the cake? · Co Tom powiedział?',pl:'Co Tom powiedział?',type:'choice',options:['It was too sweet · Było za słodkie','It was the best ever · Było najlepsze','It was too small · Było za małe'],answer:1}]},
+      {title:'School Lunch',text:'Today at school we had pasta for lunch. 🍝 I like pasta because it is warm and filling. My friend Jake had a sandwich but he wanted pasta too. After lunch we had an apple for pudding. It was a good meal!',glossary:{pasta:'makaron',filling:'sycący',sandwich:'kanapka',pudding:'deser',meal:'posiłek'},questions:[{q:'What did they have for lunch? · Co jedli na obiad?',pl:'Co jedli na obiad?',type:'choice',options:['Pizza · Pizzę','Pasta · Makaron','Soup · Zupę'],answer:1},{q:'Why does the writer like pasta? · Dlaczego autor lubi makaron?',pl:'Dlaczego autor lubi makaron?',type:'choice',options:['It is cold · Jest zimny','It is warm and filling · Jest ciepły i sycący','It is sweet · Jest słodki'],answer:1},{q:'What did Jake have? · Co miał Jake?',pl:'Co miał Jake?',type:'choice',options:['Pasta · Makaron','A sandwich · Kanapkę','Soup · Zupę'],answer:1},{q:'What did they have for pudding? · Co jedli na deser?',pl:'Co jedli na deser?',type:'choice',options:['Cake · Ciasto','An apple · Jabłko','Ice cream · Lody'],answer:1}]},
+    ],
+    weather:[
+      {title:'The Snowman',text:'Yesterday it was very cold and snowy. ❄️ Ola put on her coat, hat, and gloves. She went outside and made a snowman with her brother. The snowman had a carrot nose and a big smile. They were so cold but very happy!',glossary:{snowy:'śnieżnie',snowman:'bałwan',carrot:'marchewka',smile:'uśmiech',cold:'zimno'},questions:[{q:'What was the weather like? · Jaka była pogoda?',pl:'Jaka była pogoda?',type:'choice',options:['Hot and sunny · Gorąco i słonecznie','Cold and snowy · Zimno i śnieżnie','Windy and rainy · Wietrznie i deszczowo'],answer:1},{q:'What did Ola put on? · Co założyła Ola?',pl:'Co założyła Ola?',type:'choice',options:['Coat hat and gloves · Płaszcz czapkę i rękawiczki','Dress and shoes · Sukienkę i buty','Jumper and scarf · Sweter i szalik'],answer:0},{q:'What did Ola and her brother make? · Co zrobiła Ola z bratem?',pl:'Co zrobiła Ola z bratem?',type:'choice',options:['A snow angel · Anioła ze śniegu','A snowman · Bałwana','A snowball · Kulę śniegową'],answer:1},{q:'What did the snowman have for a nose? · Co miał bałwan zamiast nosa?',pl:'Co miał bałwan zamiast nosa?',type:'choice',options:['A stick · Patyk','A stone · Kamyk','A carrot · Marchewkę'],answer:2}]},
+      {title:'A Rainy Day',text:'It is raining outside. 🌧️ I cannot go to the park so I am inside today. I am reading a book by the window. I can see big puddles on the street. I hope the sun comes out tomorrow!',glossary:{raining:'pada deszcz',outside:'na zewnątrz',puddles:'kałuże',street:'ulica',hope:'mam nadzieję'},questions:[{q:"Why can't the child go to the park? · Dlaczego dziecko nie może iść do parku?",pl:'Dlaczego dziecko nie może iść do parku?',type:'choice',options:['It is too hot · Jest za gorąco','It is raining · Pada deszcz','The park is closed · Park jest zamknięty'],answer:1},{q:'What is the child doing? · Co robi dziecko?',pl:'Co robi dziecko?',type:'choice',options:['Watching TV · Ogląda TV','Reading a book · Czyta książkę','Playing a game · Gra w grę'],answer:1},{q:'What can the child see outside? · Co dziecko widzi?',pl:'Co dziecko widzi?',type:'choice',options:['Snow · Śnieg','Big puddles · Duże kałuże','A rainbow · Tęczę'],answer:1},{q:'What does the child hope for tomorrow? · Na co dziecko ma nadzieję jutro?',pl:'Na co dziecko ma nadzieję jutro?',type:'choice',options:['More rain · Więcej deszczu','Snow · Śnieg','Sun · Słońce'],answer:2}]},
+    ],
+    places:[
+      {title:'The Water Park',text:"Ben wants to go to the water park. 💦 He asks his mum: 'Is there a water park in town?' His mum says: 'Yes, there is! It is on Green Street.' Ben is excited. He also wants to go to the cinema but there isn't one near their house.",glossary:{excited:'podekscytowany',cinema:'kino','water park':'park wodny',near:'blisko',asks:'pyta',street:'ulica'},questions:[{q:'Where does Ben want to go? · Dokąd chce iść Ben?',pl:'Dokąd chce iść Ben?',type:'choice',options:['To the zoo · Do zoo','To the water park · Do parku wodnego','To the beach · Na plażę'],answer:1},{q:'Is there a water park in town? · Czy w mieście jest park wodny?',pl:'Czy w mieście jest park wodny?',type:'choice',options:['Yes there is · Tak jest','No there is not · Nie ma','Ben does not know · Ben nie wie'],answer:0},{q:'Where is the water park? · Gdzie jest park wodny?',pl:'Gdzie jest park wodny?',type:'choice',options:['On Blue Street · Na Niebieskiej Ulicy','On Green Street · Na Zielonej Ulicy','On the beach · Na plaży'],answer:1},{q:"Is there a cinema near Ben's house? · Czy jest kino blisko domu Bena?",pl:'Czy jest kino blisko domu Bena?',type:'choice',options:['Yes there is · Tak jest','No there is not · Nie ma','He does not know · Nie wie'],answer:1}]},
+      {title:'The School Trip',text:'Our class went on a trip to the science museum. 🔬 We went by coach. At the museum we saw real dinosaur bones and a big rocket. I pressed a button and lights flashed! After that we had lunch in the park. It was the best trip ever.',glossary:{trip:'wycieczka',coach:'autokar',dinosaur:'dinozaur',rocket:'rakieta',flashed:'błyskały',bones:'kości'},questions:[{q:'Where did the class go? · Dokąd pojechała klasa?',pl:'Dokąd pojechała klasa?',type:'choice',options:['To the zoo · Do zoo','To the science museum · Do muzeum nauki','To the cinema · Do kina'],answer:1},{q:'How did they get there? · Jak tam dojechali?',pl:'Jak tam dojechali?',type:'choice',options:['By bus · Autobusem','By coach · Autokarem','By train · Pociągiem'],answer:1},{q:'What happened when the child pressed a button? · Co się stało?',pl:'Co się stało gdy dziecko nacisnęło przycisk?',type:'choice',options:['Music played · Zagrała muzyka','Lights flashed · Błyskały światła','A door opened · Otworzyły się drzwi'],answer:1},{q:'Where did they have lunch? · Gdzie jedli lunch?',pl:'Gdzie jedli lunch?',type:'choice',options:['In the museum · W muzeum','In the coach · W autokarze','In the park · W parku'],answer:2}]},
+    ],
+  },
+
+  // CHAMPION — Year 3. Past tense, because/so/but/when/even though. Questions mostly English. One open answer.
+  champion:{
+    animals:[
+      {title:'The Farm Visit',text:"Last summer, our class visited a farm. 🐄 We saw cows, sheep, and horses. The farmer told us that cows give us milk every morning. I was surprised because I didn't know that! We also fed the sheep with grass. It was a brilliant day and I learned a lot.",glossary:{visited:'odwiedziliśmy',farmer:'rolnik',surprised:'zaskoczony',fed:'nakarmiliśmy',brilliant:'wspaniały',sheep:'owce'},questions:[{q:'When did the class visit the farm?',pl:'Kiedy klasa odwiedziła farmę?',type:'choice',options:['Last winter','Last summer','Last spring'],answer:1},{q:'What did the farmer tell them about cows?',pl:'Co rolnik powiedział im o krowach?',type:'choice',options:['Cows eat a lot of grass','Cows give milk every morning','Cows sleep during the day'],answer:1},{q:'What did the children feed the sheep with?',pl:'Czym dzieci nakarmiły owce?',type:'choice',options:['Bread','Water','Grass'],answer:2},{q:'Write one thing you would like to see on a farm and why.',pl:'Napisz jedną rzecz którą chciałbyś zobaczyć na farmie i dlaczego.',type:'open',placeholder:'Write in English... · Napisz po angielsku...',modelAnswer:'I would like to see a horse because they are big and beautiful.'}]},
+      {title:'Penguins Are Amazing',text:"Penguins are black and white birds, but they cannot fly. 🐧 Instead, they are brilliant swimmers and can dive very deep into the sea. They live in very cold places like Antarctica. Penguins lay eggs and both the mum and dad take turns keeping the egg warm. Baby penguins are called chicks and they are very fluffy.",glossary:{penguins:'pingwiny',brilliant:'świetni',dive:'nurkować',Antarctica:'Antarktyka',fluffy:'puszysty'},questions:[{q:"Why can't penguins fly?",pl:'Dlaczego pingwiny nie mogą latać?',type:'choice',options:['Their wings are too small','They are birds that swim instead','They are too heavy'],answer:1},{q:'Where do penguins live?',pl:'Gdzie mieszkają pingwiny?',type:'choice',options:['In hot countries','In forests','In cold places like Antarctica'],answer:2},{q:'What do both parents do with the egg?',pl:'Co oboje rodzice robią z jajkiem?',type:'choice',options:['They leave it alone','They take turns keeping it warm','Only the mum keeps it warm'],answer:1},{q:'What are baby penguins called and what are they like?',pl:'Jak się nazywają małe pingwiny i jakie są?',type:'open',placeholder:'Write in English... · Napisz po angielsku...',modelAnswer:'Baby penguins are called chicks and they are very fluffy.'}]},
+      {title:'My Dog Bruno',text:"My dog Bruno is three years old and he is a golden retriever. 🐶 He is very friendly and loves to play fetch in the garden. Every morning I take him for a walk before school, even when it is raining. Bruno always knows when I am sad because he comes and sits next to me. He is the best dog in the world.",glossary:{retriever:'retriever',friendly:'przyjazny',fetch:'aportowanie',walk:'spacer',even:'nawet',knows:'wie'},questions:[{q:'What type of dog is Bruno?',pl:'Jakiej rasy jest Bruno?',type:'choice',options:['A labrador','A golden retriever','A poodle'],answer:1},{q:'When does the writer walk Bruno?',pl:'Kiedy autor chodzi z Brunem?',type:'choice',options:['After school','Before school every morning','Only on weekends'],answer:1},{q:'How does Bruno know when the writer is sad?',pl:'Skąd Bruno wie gdy autor jest smutny?',type:'choice',options:['He barks loudly','He hides under the bed','He comes and sits next to them'],answer:2},{q:'Write one sentence describing your favourite animal.',pl:'Napisz jedno zdanie opisujące twoje ulubione zwierzę.',type:'open',placeholder:'Write in English... · Napisz po angielsku...',modelAnswer:'My favourite animal is a dolphin because it is clever and friendly.'}]},
+    ],
+    weather:[
+      {title:'The Storm',text:"Last Monday it was very stormy. ⛈️ The wind blew so hard that a tree fell down in our garden. When I looked outside, I saw big puddles everywhere. School was cancelled so we stayed at home all day. My mum made hot chocolate and we watched films together. Even though the storm was scary, the day at home was really fun.",glossary:{stormy:'burzliwie',blew:'wiał',puddles:'kałuże',cancelled:'odwołana',scary:'straszna'},questions:[{q:'What happened to the tree?',pl:'Co stało się z drzewem?',type:'choice',options:['It grew very tall','It fell down in the garden','It lost all its leaves'],answer:1},{q:'Why did the children stay at home?',pl:'Dlaczego dzieci zostały w domu?',type:'choice',options:['They were ill','School was cancelled','It was a holiday'],answer:1},{q:'What did the mum make?',pl:'Co zrobiła mama?',type:'choice',options:['Pizza','Soup','Hot chocolate'],answer:2},{q:'How did the writer feel about the day at home?',pl:'Jak autor czuł się tego dnia?',type:'choice',options:['Bored and sad','Really fun','Very scared all day'],answer:1}]},
+      {title:'The Four Seasons',text:'Britain has four seasons: spring, summer, autumn, and winter. 🌸☀️🍂❄️ In spring, flowers start to grow and the days get longer. Summer is the warmest season and people often go on holiday. In autumn, the leaves turn orange and red and fall from the trees. Winter can be cold and frosty, and sometimes it snows.',glossary:{seasons:'pory roku',spring:'wiosna',autumn:'jesień',frosty:'mroźny',warmest:'najcieplejszy',grow:'rosnąć'},questions:[{q:'What happens to days in spring?',pl:'Co dzieje się z dniami wiosną?',type:'choice',options:['They get shorter','They get longer','They stay the same'],answer:1},{q:'What do people often do in summer?',pl:'Co ludzie często robią latem?',type:'choice',options:['Go skiing','Go on holiday','Stay inside'],answer:1},{q:'What happens to leaves in autumn?',pl:'Co dzieje się z liśćmi jesienią?',type:'choice',options:['They turn green and grow','They turn orange and red and fall','They turn white and freeze'],answer:1},{q:'Write one sentence about your favourite season and explain why.',pl:'Napisz jedno zdanie o ulubionej porze roku i wyjaśnij dlaczego.',type:'open',placeholder:'Write in English... · Napisz po angielsku...',modelAnswer:'My favourite season is summer because the days are long and warm.'}]},
+    ],
+    food:[
+      {title:'Pizza Friday',text:"Every Friday, our family has pizza night. 🍕 My dad makes the dough and my sister spreads the tomato sauce. I choose the toppings — I always pick cheese and sweetcorn. My little brother just wants plain cheese because he is fussy. When the pizza comes out of the oven, the whole house smells amazing. It is my favourite night of the week.",glossary:{dough:'ciasto',spreads:'rozsmarowuje',toppings:'dodatki',sweetcorn:'kukurydza',fussy:'wybredny',oven:'piekarnik'},questions:[{q:'What does the dad make?',pl:'Co robi tata?',type:'choice',options:['The sauce','The dough','The toppings'],answer:1},{q:'What toppings does the writer choose?',pl:'Jakie dodatki wybiera autor?',type:'choice',options:['Ham and mushrooms','Cheese and sweetcorn','Tomato and peppers'],answer:1},{q:'Why does the little brother only want plain cheese?',pl:'Dlaczego młodszy brat chce tylko sam ser?',type:'choice',options:['He is allergic','He is fussy','He does not like pizza'],answer:1},{q:'Write one sentence about your favourite meal.',pl:'Napisz jedno zdanie o swoim ulubionym posiłku.',type:'open',placeholder:'Write in English... · Napisz po angielsku...',modelAnswer:'My favourite meal is pizza because it is delicious and I love cheese.'}]},
+      {title:'The Bake Sale',text:'Last week our school had a bake sale to raise money for charity. 🧁 Everyone brought in cakes, biscuits, and cookies that they made at home. I made chocolate brownies with my grandma the night before. We sold everything very quickly because the cakes looked and smelled delicious. We raised fifty pounds in total, which made everyone very proud.',glossary:{charity:'cel charytatywny',biscuits:'herbatniki',brownies:'brownie',raised:'zebraliśmy',proud:'dumny',quickly:'szybko'},questions:[{q:'Why did the school have a bake sale?',pl:'Dlaczego szkoła zorganizowała kiermasz?',type:'choice',options:['To celebrate a birthday','To raise money for charity','To practise cooking'],answer:1},{q:'What did the writer make?',pl:'Co zrobił autor?',type:'choice',options:['Biscuits','Chocolate brownies','Cookies'],answer:1},{q:'Who helped the writer make them?',pl:'Kto pomógł autorowi je zrobić?',type:'choice',options:['Their mum','Their teacher','Their grandma'],answer:2},{q:'How much money did they raise?',pl:'Ile pieniędzy zebrali?',type:'choice',options:['Twenty pounds','Fifty pounds','One hundred pounds'],answer:1}]},
+    ],
+    places:[
+      {title:'The Science Museum',text:'On Saturday, our family went to the science museum. 🔬 There was so much to see! We looked at dinosaur bones and watched a show about volcanoes. I pressed a button and a real rocket moved — it was amazing! My favourite part was the space room because there were models of planets hanging from the ceiling. I want to go back next month.',glossary:{museum:'muzeum',dinosaur:'dinozaur',volcanoes:'wulkany',rocket:'rakieta',ceiling:'sufit',models:'modele'},questions:[{q:'Where did the family go on Saturday?',pl:'Dokąd rodzina poszła w sobotę?',type:'choice',options:['To the zoo','To the science museum','To the cinema'],answer:1},{q:'What happened when the writer pressed a button?',pl:'Co się stało gdy autor nacisnął przycisk?',type:'choice',options:['A light turned on','A real rocket moved','The doors opened'],answer:1},{q:'Why was the space room the best?',pl:'Dlaczego pokój kosmiczny był najlepszy?',type:'choice',options:['It was the biggest room','There were models of planets on the ceiling','There were astronaut suits to try on'],answer:1},{q:'Write one sentence about a place you want to visit.',pl:'Napisz jedno zdanie o miejscu które chcesz odwiedzić.',type:'open',placeholder:'Write in English... · Napisz po angielsku...',modelAnswer:'I want to go to the aquarium because I love fish and it sounds really exciting.'}]},
+      {title:'A Day at the Beach',text:'In July, my family went to the beach for the day. 🏖️ The sun was shining and the sea was warm so we went swimming. My little sister built a huge sandcastle with Dad while Mum read her book. We had fish and chips for lunch which tasted amazing. On the way home everyone fell asleep in the car because we were so tired. It was a perfect day.',glossary:{shining:'świeciło',sandcastle:'zamek z piasku',chips:'frytki',tasted:'smakowały',perfect:'idealny'},questions:[{q:'What was the weather like at the beach?',pl:'Jaka była pogoda na plaży?',type:'choice',options:['Cloudy and cold','Sunny and warm','Windy and rainy'],answer:1},{q:'What did the little sister and Dad do?',pl:'Co robiły siostra i tata?',type:'choice',options:['They went swimming','They built a sandcastle','They read books'],answer:1},{q:'What did they eat for lunch?',pl:'Co jedli na lunch?',type:'choice',options:['Pizza','Sandwiches','Fish and chips'],answer:2},{q:'Why did everyone fall asleep on the way home?',pl:'Dlaczego wszyscy zasnęli w drodze do domu?',type:'choice',options:['It was very late','They were so tired','The car was very warm'],answer:1}]},
+    ],
+  }
+};
+
+// Pick a random reading text for the current mode
+let readingData=null, readingQIndex=0, readingStars=0, readingCorrect=0;
+let currentReadingTopic='', currentReadingTexts=[];
+
+function startReading(){
+  const mode=currentMode;
+  const modeTexts=READING_TEXTS[mode];
+  if(!modeTexts){alert('Reading not available for this level yet!');return;}
+  showReadingPicker(modeTexts);
+}
+
+function showReadingPicker(modeTexts){
+  const mode=currentMode;
+  // Build a flat list of all texts across all topics, with labels
+  const allTexts=[];
+  Object.entries(modeTexts).forEach(([topicId,texts])=>{
+    const t=TOPICS.find(x=>x.id===topicId)||{emoji:'📖',en:topicId};
+    texts.forEach((textObj,i)=>{
+      allTexts.push({topicId,topicEmoji:t.emoji,topicEn:t.en,textObj,index:i});
+    });
+  });
+
+  const gh=document.getElementById('readingHeader');
+  gh.className='game-header header-'+mode;
+  document.getElementById('readingLessonName').textContent='📖 Reading Corner';
+  document.getElementById('readingProgressText').textContent='Choose a story · Wybierz tekst';
+  document.getElementById('readingProgressFill').style.width='0%';
+  document.getElementById('readingStarCount').textContent='0';
+
+  const card=document.getElementById('readingCard');
+  const bc=mode+'-badge';
+  card.innerHTML=`
+    <span class="q-type-badge ${bc}">📖 Reading Corner</span>
+    <p class="q-prompt" style="margin-bottom:20px;">Pick a text to read · Wybierz tekst do czytania</p>
+    <div style="display:flex;flex-direction:column;gap:10px;" id="pickerList">
+      ${allTexts.map((item,idx)=>`
+        <button onclick="loadReadingText(${idx})" style="
+          background:#f8faff;border:2px solid #e0e7ff;border-radius:14px;
+          padding:14px 16px;cursor:pointer;text-align:left;
+          font-family:'Nunito',sans-serif;transition:all .15s;
+          display:flex;align-items:center;gap:12px;
+        " onmouseover="this.style.background='#eef2ff';this.style.borderColor='#a5b4fc'"
+           onmouseout="this.style.background='#f8faff';this.style.borderColor='#e0e7ff'">
+          <span style="font-size:28px">${item.topicEmoji}</span>
+          <div>
+            <div style="font-family:'Fredoka One',cursive;font-size:16px;color:#1e1b4b;">${item.textObj.title}</div>
+            <div style="font-size:12px;color:#6b7280;font-weight:700;margin-top:2px;">${item.topicEn} · ${item.textObj.questions.length} questions</div>
+          </div>
+          <span style="margin-left:auto;color:#a5b4fc;font-size:20px;">→</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+  window._readingAllTexts=allTexts;
+  showScreen('reading');
+}
+
+function loadReadingText(idx){
+  const item=window._readingAllTexts[idx];
+  readingData=item.textObj;
+  readingQIndex=0; readingStars=0; readingCorrect=0;
+  document.getElementById('readingLessonName').textContent='📖 '+item.textObj.title;
+  document.getElementById('readingStarCount').textContent='0';
+  renderReadingScreen();
+}
+
+function renderReadingScreen(){
+  const card=document.getElementById('readingCard');
+  const mode=currentMode;
+  const bc=mode+'-badge', btn=mode+'-btn';
+  const total=readingData.questions.length;
+  const q=readingData.questions[readingQIndex];
+
+  document.getElementById('readingProgressText').textContent=`Question ${readingQIndex+1} of ${total} · Pytanie ${readingQIndex+1} z ${total}`;
+  document.getElementById('readingProgressFill').style.width=`${(readingQIndex/total)*100}%`;
+  document.getElementById('readingStarCount').textContent=readingStars;
+
+  // Build highlighted text
+  let textHtml=readingData.text;
+  Object.entries(readingData.glossary).forEach(([word,translation])=>{
+    const re=new RegExp('\\b'+word+'\\b','gi');
+    textHtml=textHtml.replace(re,`<span class="hl" onclick="showTip(this,'${translation}')">${word}</span>`);
+  });
+
+  const choicesHtml = q.type==='choice'
+    ? `<div class="choices" id="rChoices">${q.options.map((o,i)=>`<button class="choice-btn" onclick="checkReadingChoice(this,${i},${q.answer})"><span class="choice-en">${o}</span></button>`).join('')}</div>`
+    : `<textarea class="reading-open-input" id="openInput" placeholder="${q.placeholder}"></textarea>
+       <button class="submit-btn ${btn}" onclick="checkOpenAnswer()" style="margin-top:12px;">Check · Sprawdź ✓</button>`;
+
+  card.innerHTML=`
+    <span class="q-type-badge ${bc}">📖 ${readingData.title||'Reading Corner'}</span>
+    <div class="read-speak-row">
+      <div class="read-label" style="margin-bottom:0;">💡 Tap <span style="background:#fef3c7;padding:0 4px;border-radius:4px;">yellow words</span> for Polish · Kliknij żółte słowa</div>
+      <button class="speak-btn" onclick="speak(${JSON.stringify(readingData.text)},this)" style="margin-bottom:0;"><span class="speak-icon">🔊</span> Read aloud · Przeczytaj</button>
+    </div>
+    <div class="reading-text-box" id="readingTextBox">${textHtml}</div>
+    <div class="reading-q-title">Question ${readingQIndex+1} · Pytanie ${readingQIndex+1}</div>
+    <p class="q-pl" style="font-size:18px;margin-bottom:6px;">${q.pl}</p>
+    <p class="q-prompt">${q.q}</p>
+    <div style="margin-top:14px;">${choicesHtml}</div>
+    <div class="feedback" id="rFeedback"><span class="fb-icon"></span><span id="rFbText"></span></div>
+    <button class="next-btn ${btn}" id="rNextBtn" onclick="nextReadingQ()">Next · Dalej →</button>
+  `;
+}
+
+function showTip(el, translation){
+  // Remove any existing tooltip
+  document.querySelectorAll('.tooltip').forEach(t=>t.remove());
+  const tip=document.createElement('span');
+  tip.className='tooltip';
+  tip.textContent=translation;
+  el.style.position='relative';
+  el.appendChild(tip);
+  el.classList.add('highlight-pulse');
+  setTimeout(()=>{tip.remove();el.classList.remove('highlight-pulse');},2000);
+}
+
+function checkReadingChoice(btn,chosen,correct){
+  document.querySelectorAll('#rChoices .choice-btn').forEach(b=>b.disabled=true);
+  const ok=chosen===correct;
+  btn.classList.add(ok?'correct':'wrong');
+  if(!ok){
+    document.querySelectorAll('#rChoices .choice-btn')[correct].classList.add('correct');
+  }
+  showReadingFeedback(ok);
+  if(ok){readingStars++;readingCorrect++;document.getElementById('readingStarCount').textContent=readingStars;}
+}
+
+function checkOpenAnswer(){
+  const inp=document.getElementById('openInput');
+  const modelAns=readingData.questions[readingQIndex].modelAnswer;
+  inp.disabled=true;
+  document.querySelector('#readingCard .submit-btn').disabled=true;
+  const fb=document.getElementById('rFeedback');
+  fb.className='feedback show correct-fb';
+  fb.querySelector('.fb-icon').textContent='✅';
+  document.getElementById('rFbText').innerHTML=`Great effort! · Świetna próba!<br><span style="font-size:13px;opacity:.8;">Model answer · Przykładowa odpowiedź: <em>${modelAns}</em></span>`;
+  document.getElementById('rNextBtn').classList.add('show');
+  readingStars++;readingCorrect++;
+  document.getElementById('readingStarCount').textContent=readingStars;
+}
+
+function showReadingFeedback(ok){
+  const fb=document.getElementById('rFeedback');
+  const nbtn=document.getElementById('rNextBtn');
+  fb.classList.add('show');
+  if(ok){
+    fb.className='feedback show correct-fb';
+    const msgs=['⭐ Brilliant! · Wspaniale!','🌟 Well done! · Świetnie!','🎉 Correct! · Dobrze!','✨ Great reading! · Świetne czytanie!'];
+    fb.querySelector('.fb-icon').textContent='✅';
+    document.getElementById('rFbText').textContent=msgs[Math.floor(Math.random()*msgs.length)];
+  } else {
+    fb.className='feedback show wrong-fb';
+    fb.querySelector('.fb-icon').textContent='❌';
+    document.getElementById('rFbText').textContent='Try finding the answer in the text! · Spróbuj znaleźć odpowiedź w tekście!';
+  }
+  nbtn.classList.add('show');
+}
+
+function nextReadingQ(){
+  readingQIndex++;
+  if(readingQIndex>=readingData.questions.length){
+    showReadingResults();
+  } else {
+    renderReadingScreen();
+  }
+}
+
+function showReadingResults(){
+  document.getElementById('readingProgressFill').style.width='100%';
+  const total=readingData.questions.length;
+  const pct=Math.round((readingCorrect/total)*100);
+  let trophy='💪',title='Keep reading!',pl='Czytaj dalej!';
+  if(pct===100){trophy='🌟';title='Perfect reader!';pl='Idealny czytelnik!';}
+  else if(pct>=75){trophy='🏆';title='Excellent!';pl='Doskonale!';}
+  else if(pct>=50){trophy='🥈';title='Good job!';pl='Dobra robota!';}
+  document.getElementById('resultsTrophy').textContent=trophy;
+  document.getElementById('resultsTitle').textContent=title;
+  document.getElementById('resultsPl').textContent=pl;
+  document.getElementById('starsEarned').textContent='⭐ '+readingStars;
+  document.getElementById('scoreDetail').textContent=`${readingCorrect} / ${total} correct · poprawnych`;
+  window._readingResultsMode=true;
+  showScreen('results');
+  if(pct>=50)confetti();
+}
+
+
+function confetti(){
+  const colors=['#FF6B6B','#FFD93D','#6BCB77','#4CC9F0','#C77DFF','#FF9F1C'];
+  for(let i=0;i<80;i++){
+    setTimeout(()=>{
+      const p=document.createElement('div');
+      p.className='confetti-piece';
+      const s=Math.random()*10+6;
+      p.style.cssText=`left:${Math.random()*100}vw;width:${s}px;height:${s}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*.5}s;`;
+      document.body.appendChild(p);
+      setTimeout(()=>p.remove(),3000);
+    },i*30);
+  }
+}
+</script>
+</body>
+</html>
